@@ -1,0 +1,46 @@
+{
+  "name": "survey-form-builder",
+  "version": "1.0.0",
+  "description": "A comprehensive form builder web application with role-based access control",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "client": "cd client && npm start",
+    "server": "nodemon server.js",
+    "build": "cd client && npm run build",
+    "heroku-postbuild": "cd client && npm install && npm run build",
+    "setup:windows": "powershell -ExecutionPolicy Bypass -File setup-windows.ps1",
+    "setup:windows-cmd": "setup-windows.bat",
+    "test:connection": "node test-db.js",
+    "test:auth": "node test-auth.js",
+    "test:windows": "node test-windows-setup.js",
+    "clean": "rimraf node_modules package-lock.json",
+    "reinstall": "npm run clean && npm install"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "rimraf": "^5.0.5",
+    "cross-env": "^7.0.3"
+  },
+  "keywords": [
+    "form-builder",
+    "survey",
+    "mongodb",
+    "role-based-access",
+    "dashboard"
+  ],
+  "author": "Krishna Gaurav",
+  "license": "MIT"
+}

@@ -1,0 +1,721 @@
+/* Form Viewer Styles */
+
+.form-viewer-body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.form-viewer-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.form-viewer-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 0;
+}
+
+.form-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.form-brand i {
+    font-size: 1.5rem;
+}
+
+/* Content */
+.form-viewer-content {
+    flex: 1;
+    padding: 2rem 0;
+}
+
+/* Form Info Card */
+.form-info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.form-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.form-description {
+    font-size: 1.1rem;
+    color: #4a5568;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.form-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-app {
+    background: #e2e8f0;
+    color: #2d3748;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.form-stats {
+    color: #718096;
+    font-size: 0.875rem;
+}
+
+/* Form Card */
+.form-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Form Fields */
+.form-field {
+    margin-bottom: 1.5rem;
+}
+
+.form-field:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #e53e3e;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #e53e3e;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Choice Fields */
+.radio-group,
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.form-check:hover {
+    border-color: #cbd5e0;
+    background: #f7fafc;
+}
+
+.form-check-input {
+    margin: 0;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.form-check-label {
+    margin: 0;
+    cursor: pointer;
+    flex: 1;
+    font-weight: 500;
+}
+
+/* File Upload */
+.file-upload-field {
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.file-upload-field:hover {
+    border-color: #a0aec0;
+    background: #f7fafc;
+}
+
+.file-upload-btn {
+    border: none;
+    background: #667eea;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.file-upload-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.file-upload-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+}
+
+.file-name {
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.remove-file-btn {
+    border: none;
+    background: none;
+    color: #e53e3e;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.remove-file-btn:hover {
+    background: #fed7d7;
+}
+
+/* Signature Field */
+.signature-field {
+    text-align: center;
+}
+
+.signature-btn {
+    border: 2px dashed #cbd5e0;
+    background: white;
+    color: #4a5568;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.signature-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+    background: #f7fafc;
+}
+
+.signature-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.signature-image {
+    max-width: 200px;
+    max-height: 60px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+}
+
+.remove-signature-btn {
+    border: none;
+    background: none;
+    color: #e53e3e;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.remove-signature-btn:hover {
+    background: #fed7d7;
+}
+
+/* Rating Field */
+.rating-field {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.rating-star {
+    font-size: 1.5rem;
+    color: #cbd5e0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rating-star:hover {
+    color: #fbbf24;
+    transform: scale(1.1);
+}
+
+.rating-star i.fas {
+    color: #fbbf24;
+}
+
+/* Layout Fields */
+.heading-field {
+    margin: 2rem 0 1rem 0;
+}
+
+.field-heading {
+    color: #2d3748;
+    font-weight: 700;
+    margin: 0;
+}
+
+.paragraph-field {
+    margin: 1rem 0;
+}
+
+.field-paragraph {
+    color: #4a5568;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.divider-field {
+    margin: 2rem 0;
+}
+
+.field-divider {
+    border: none;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 0;
+}
+
+.spacer-field {
+    width: 100%;
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+.form-actions .btn {
+    padding: 0.875rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    min-width: 150px;
+}
+
+.form-actions .btn-primary {
+    background: #667eea;
+    border-color: #667eea;
+}
+
+.form-actions .btn-primary:hover {
+    background: #5a67d8;
+    border-color: #5a67d8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.form-actions .btn:disabled {
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Success Card */
+.success-card {
+    background: white;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: #38a169;
+    margin-bottom: 1rem;
+}
+
+.success-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    font-size: 1.1rem;
+    color: #4a5568;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.success-actions {
+    margin-top: 2rem;
+}
+
+/* Footer */
+.form-viewer-footer {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.powered-by {
+    opacity: 0.8;
+}
+
+.form-security {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.8;
+}
+
+/* File Upload Modal */
+.upload-area {
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.upload-area:hover,
+.upload-area.drag-over {
+    border-color: #667eea;
+    background: #f7fafc;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #a0aec0;
+    margin-bottom: 1rem;
+}
+
+.upload-text p {
+    margin: 0.25rem 0;
+}
+
+.upload-progress {
+    margin-top: 1rem;
+}
+
+.progress {
+    height: 8px;
+    border-radius: 4px;
+    background: #e2e8f0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #667eea;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #4a5568;
+}
+
+.uploaded-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.file-info i {
+    color: #4a5568;
+}
+
+.file-size {
+    color: #718096;
+    font-size: 0.875rem;
+}
+
+/* Signature Modal */
+.signature-pad-container {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    overflow: hidden;
+}
+
+.signature-pad {
+    display: block;
+    width: 100%;
+    height: 200px;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.signature-actions {
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-viewer-content {
+        padding: 1rem 0;
+    }
+    
+    .form-info-card,
+    .form-card,
+    .success-card {
+        margin: 0 1rem 1rem 1rem;
+        padding: 1.5rem;
+    }
+    
+    .form-title {
+        font-size: 1.5rem;
+    }
+    
+    .form-description {
+        font-size: 1rem;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .form-meta {
+        justify-content: center;
+    }
+    
+    .radio-group,
+    .checkbox-group {
+        gap: 0.5rem;
+    }
+    
+    .form-check {
+        padding: 0.5rem;
+    }
+    
+    .rating-field {
+        justify-content: center;
+    }
+    
+    .rating-star {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-info-card,
+    .form-card,
+    .success-card {
+        margin: 0 0.5rem 1rem 0.5rem;
+        padding: 1rem;
+    }
+    
+    .form-title {
+        font-size: 1.25rem;
+    }
+    
+    .success-card {
+        padding: 2rem 1rem;
+    }
+    
+    .success-icon {
+        font-size: 3rem;
+    }
+    
+    .success-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-info-card,
+.form-card,
+.success-card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Loading States */
+.loading-field {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading-field::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Accessibility */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus,
+.btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .form-control,
+    .form-select {
+        border-width: 3px;
+    }
+    
+    .form-check {
+        border-width: 3px;
+    }
+    
+    .btn {
+        border-width: 3px;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .form-viewer-header,
+    .form-viewer-footer,
+    .form-actions {
+        display: none;
+    }
+    
+    .form-viewer-body {
+        background: white;
+    }
+    
+    .form-info-card,
+    .form-card {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}

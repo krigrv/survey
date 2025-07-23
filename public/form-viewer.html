@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form - Survey Builder</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/forms.css" rel="stylesheet">
+    <link href="/css/shadcn-forms.css" rel="stylesheet">
+    <link href="/css/form-viewer.css" rel="stylesheet">
+</head>
+<body class="form-viewer-body">
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-viewer-container">
+        <!-- Form Header -->
+        <div class="form-viewer-header">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="form-brand">
+                            <i class="fas fa-poll-h"></i>
+                            <span>Survey Builder</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form Content -->
+        <div class="form-viewer-content">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <!-- Form Info -->
+                        <div class="form-info-card" id="formInfoCard">
+                            <div class="form-title text-2xl font-bold mb-3" id="formTitle">Loading...</div>
+                            <div class="form-description text-muted-foreground mb-4" id="formDescription"></div>
+                            <div class="form-meta flex flex-wrap gap-4 text-sm">
+                                <span class="form-app flex items-center gap-2" id="formApp"></span>
+                                <span class="form-stats" id="formStats"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Login Required Notice -->
+                        <div class="alert alert-info" id="loginRequiredAlert" style="display: none;">
+                            <i class="fas fa-info-circle"></i>
+                            This form requires you to be logged in to submit a response.
+                            <a href="/login.html" class="alert-link">Please log in</a> to continue.
+                        </div>
+                        
+                        <!-- Form Unavailable Notice -->
+                        <div class="alert alert-warning" id="formUnavailableAlert" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span id="unavailableMessage">This form is currently unavailable.</span>
+                        </div>
+                        
+                        <!-- Form -->
+                        <div class="form-card" id="formCard">
+                            <form id="responseForm" class="response-form">
+                                <div class="form-fields space-y-6" id="formFields">
+                                    <!-- Form fields will be rendered here -->
+                                </div>
+                                
+                                <div class="form-actions mt-8">
+                                    <button type="submit" class="btn btn-default btn-lg w-full sm:w-auto" id="submitBtn">
+                                        <i class="fas fa-paper-plane"></i>
+                                        <span id="submitBtnText">Submit</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Success Message -->
+                        <div class="success-card" id="successCard" style="display: none;">
+                            <div class="success-icon mb-4">
+                                <i class="fas fa-check-circle text-5xl text-green-500"></i>
+                            </div>
+                            <div class="success-title text-2xl font-bold mb-3">Thank You!</div>
+                            <div class="success-message text-muted-foreground mb-6" id="successMessage">
+                                Your response has been submitted successfully.
+                            </div>
+                            <div class="success-actions">
+                                <button class="btn btn-outline" id="submitAnotherBtn" style="display: none;">
+                                    <i class="fas fa-plus"></i> Submit Another Response
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form Footer -->
+        <div class="form-viewer-footer">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="footer-content">
+                            <div class="powered-by">
+                                Powered by <strong>Survey Builder</strong>
+                            </div>
+                            <div class="form-security">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Secure & Private</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Modal -->
+    <div class="modal fade" id="fileUploadModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-upload"></i> Upload File
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="upload-area border-2 border-dashed border-border rounded-lg p-8 text-center" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-muted-foreground mb-4"></i>
+                        </div>
+                        <div class="upload-text">
+                            <p class="text-lg font-semibold mb-2"><strong>Click to upload</strong> or drag and drop</p>
+                            <p class="text-muted-foreground">Maximum file size: 10MB</p>
+                        </div>
+                        <input type="file" id="fileInput" class="d-none">
+                    </div>
+                    
+                    <div class="upload-progress" id="uploadProgress" style="display: none;">
+                        <div class="progress">
+                            <div class="progress-bar" id="uploadProgressBar" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text text-muted-foreground" id="uploadProgressText">Uploading...</div>
+                    </div>
+                    
+                    <div class="uploaded-file" id="uploadedFile" style="display: none;">
+                        <div class="file-info">
+                            <i class="fas fa-file"></i>
+                            <span class="file-name" id="uploadedFileName"></span>
+                            <span class="file-size" id="uploadedFileSize"></span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeFileBtn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default" id="confirmUploadBtn" disabled>
+                        <i class="fas fa-check"></i> Use File
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature Modal -->
+    <div class="modal fade" id="signatureModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-signature"></i> Digital Signature
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="signature-pad-container border border-border rounded-lg">
+                        <canvas id="signaturePad" class="signature-pad"></canvas>
+                    </div>
+                    <div class="signature-actions mt-3">
+                        <button type="button" class="btn btn-outline" id="clearSignatureBtn">
+                            <i class="fas fa-eraser"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default" id="saveSignatureBtn">
+                        <i class="fas fa-save"></i> Save Signature
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/form-viewer.js"></script>
+    
+    <script>
+        // Form viewer initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const formViewer = new FormViewer();
+            formViewer.init();
+        });
+        
+        class FormViewer {
+            constructor() {
+                this.formId = null;
+                this.formData = null;
+                this.currentFieldId = null;
+                this.uploadedFiles = new Map();
+                this.signatures = new Map();
+            }
+            
+            async init() {
+                try {
+                    // Get form ID from URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.formId = urlParams.get('id');
+                    
+                    if (!this.formId) {
+                        this.showError('Form ID not provided');
+                        return;
+                    }
+                    
+                    await this.loadForm();
+                    this.setupEventListeners();
+                } catch (error) {
+                    console.error('Failed to initialize form viewer:', error);
+                    this.showError('Failed to load form');
+                }
+            }
+            
+            async loadForm() {
+                try {
+                    const response = await window.api.get(`/forms/${this.formId}/view`);
+                    this.formData = response.form;
+                    
+                    this.renderForm();
+                } catch (error) {
+                    if (error.status === 404) {
+                        this.showError('Form not found');
+                    } else if (error.status === 403) {
+                        this.showError('You do not have permission to view this form');
+                    } else {
+                        this.showError('Failed to load form');
+                    }
+                    throw error;
+                }
+            }
+            
+            renderForm() {
+                const form = this.formData;
+                
+                // Update form info
+                document.getElementById('formTitle').textContent = form.title;
+                document.getElementById('formDescription').textContent = form.description || '';
+                document.getElementById('formApp').textContent = form.app?.name || '';
+                
+                // Update submit button text
+                const submitBtnText = form.settings?.submitButtonText || 'Submit';
+                document.getElementById('submitBtnText').textContent = submitBtnText;
+                
+                // Check if login is required
+                if (form.settings?.requireLogin && !this.isLoggedIn()) {
+                    document.getElementById('loginRequiredAlert').style.display = 'block';
+                    document.getElementById('formCard').style.display = 'none';
+                    return;
+                }
+                
+                // Check form status
+                if (form.status !== 'published') {
+                    document.getElementById('formUnavailableAlert').style.display = 'block';
+                    document.getElementById('unavailableMessage').textContent = 
+                        form.status === 'draft' ? 'This form is still in draft mode.' : 'This form has been archived.';
+                    document.getElementById('formCard').style.display = 'none';
+                    return;
+                }
+                
+                // Render form fields
+                this.renderFormFields();
+                
+                // Update stats
+                this.updateFormStats();
+            }
+            
+            renderFormFields() {
+                const fieldsContainer = document.getElementById('formFields');
+                const fields = this.formData.fields || [];
+                
+                if (fields.length === 0) {
+                    fieldsContainer.innerHTML = '<div class="text-center text-muted">This form has no fields.</div>';
+                    return;
+                }
+                
+                const html = fields.map(field => this.renderField(field)).join('');
+                fieldsContainer.innerHTML = html;
+                
+                // Initialize field interactions
+                this.initializeFieldInteractions();
+            }
+            
+            renderField(field) {
+                const fieldId = field.id;
+                const isRequired = field.required ? 'required' : '';
+                const requiredMark = field.required ? '<span class="text-danger">*</span>' : '';
+                
+                let fieldHtml = '';
+                
+                switch (field.type) {
+                    case 'text':
+                    case 'email':
+                    case 'url':
+                    case 'phone':
+                        fieldHtml = `
+                            <input type="${field.type}" 
+                                   class="form-control" 
+                                   id="field_${fieldId}" 
+                                   name="field_${fieldId}" 
+                                   placeholder="${field.placeholder || ''}" 
+                                   ${isRequired}>
+                        `;
+                        break;
+                        
+                    case 'number':
+                        fieldHtml = `
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="field_${fieldId}" 
+                                   name="field_${fieldId}" 
+                                   placeholder="${field.placeholder || ''}" 
+                                   min="${field.min || ''}" 
+                                   max="${field.max || ''}" 
+                                   step="${field.step || ''}" 
+                                   ${isRequired}>
+                        `;
+                        break;
+                        
+                    case 'textarea':
+                        fieldHtml = `
+                            <textarea class="form-control" 
+                                      id="field_${fieldId}" 
+                                      name="field_${fieldId}" 
+                                      placeholder="${field.placeholder || ''}" 
+                                      rows="${field.rows || 3}" 
+                                      ${isRequired}></textarea>
+                        `;
+                        break;
+                        
+                    case 'select':
+                        const options = (field.options || []).map(option => 
+                            `<option value="${option.value}">${option.label}</option>`
+                        ).join('');
+                        fieldHtml = `
+                            <select class="form-select" 
+                                    id="field_${fieldId}" 
+                                    name="field_${fieldId}" 
+                                    ${isRequired}>
+                                <option value="">Choose...</option>
+                                ${options}
+                            </select>
+                        `;
+                        break;
+                        
+                    case 'radio':
+                        const radioOptions = (field.options || []).map((option, index) => `
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       id="field_${fieldId}_${index}" 
+                                       name="field_${fieldId}" 
+                                       value="${option.value}" 
+                                       ${isRequired}>
+                                <label class="form-check-label" for="field_${fieldId}_${index}">
+                                    ${option.label}
+                                </label>
+                            </div>
+                        `).join('');
+                        fieldHtml = `<div class="radio-group">${radioOptions}</div>`;
+                        break;
+                        
+                    case 'checkbox':
+                        const checkboxOptions = (field.options || []).map((option, index) => `
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="field_${fieldId}_${index}" 
+                                       name="field_${fieldId}[]" 
+                                       value="${option.value}">
+                                <label class="form-check-label" for="field_${fieldId}_${index}">
+                                    ${option.label}
+                                </label>
+                            </div>
+                        `).join('');
+                        fieldHtml = `<div class="checkbox-group">${checkboxOptions}</div>`;
+                        break;
+                        
+                    case 'date':
+                        fieldHtml = `
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="field_${fieldId}" 
+                                   name="field_${fieldId}" 
+                                   ${isRequired}>
+                        `;
+                        break;
+                        
+                    case 'time':
+                        fieldHtml = `
+                            <input type="time" 
+                                   class="form-control" 
+                                   id="field_${fieldId}" 
+                                   name="field_${fieldId}" 
+                                   ${isRequired}>
+                        `;
+                        break;
+                        
+                    case 'datetime':
+                        fieldHtml = `
+                            <input type="datetime-local" 
+                                   class="form-control" 
+                                   id="field_${fieldId}" 
+                                   name="field_${fieldId}" 
+                                   ${isRequired}>
+                        `;
+                        break;
+                        
+                    case 'file':
+                    case 'image':
+                        fieldHtml = `
+                            <div class="file-upload-field">
+                                <button type="button" class="btn btn-outline-primary file-upload-btn" data-field-id="${fieldId}">
+                                    <i class="fas fa-upload"></i> Choose File
+                                </button>
+                                <div class="file-upload-info" id="fileInfo_${fieldId}" style="display: none;">
+                                    <span class="file-name"></span>
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-file-btn" data-field-id="${fieldId}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="field_${fieldId}" name="field_${fieldId}">
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'signature':
+                        fieldHtml = `
+                            <div class="signature-field">
+                                <button type="button" class="btn btn-outline-primary signature-btn" data-field-id="${fieldId}">
+                                    <i class="fas fa-signature"></i> Add Signature
+                                </button>
+                                <div class="signature-preview" id="signaturePreview_${fieldId}" style="display: none;">
+                                    <img src="" alt="Signature" class="signature-image">
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-signature-btn" data-field-id="${fieldId}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="field_${fieldId}" name="field_${fieldId}">
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'rating':
+                        const maxRating = field.maxRating || 5;
+                        const stars = Array.from({length: maxRating}, (_, i) => `
+                            <span class="rating-star" data-rating="${i + 1}">
+                                <i class="far fa-star"></i>
+                            </span>
+                        `).join('');
+                        fieldHtml = `
+                            <div class="rating-field" data-field-id="${fieldId}">
+                                ${stars}
+                                <input type="hidden" id="field_${fieldId}" name="field_${fieldId}">
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'heading':
+                        const headingLevel = field.level || 'h3';
+                        return `
+                            <div class="form-field heading-field">
+                                <${headingLevel} class="field-heading">${field.text || 'Heading'}</${headingLevel}>
+                            </div>
+                        `;
+                        
+                    case 'paragraph':
+                        return `
+                            <div class="form-field paragraph-field">
+                                <p class="field-paragraph">${field.text || 'Paragraph text'}</p>
+                            </div>
+                        `;
+                        
+                    case 'divider':
+                        return `
+                            <div class="form-field divider-field">
+                                <hr class="field-divider">
+                            </div>
+                        `;
+                        
+                    case 'spacer':
+                        const height = field.height || 20;
+                        return `
+                            <div class="form-field spacer-field" style="height: ${height}px;"></div>
+                        `;
+                        
+                    default:
+                        fieldHtml = `<div class="alert alert-warning">Unsupported field type: ${field.type}</div>`;
+                }
+                
+                // Skip layout fields that don't need form-field wrapper
+                if (['heading', 'paragraph', 'divider', 'spacer'].includes(field.type)) {
+                    return fieldHtml;
+                }
+                
+                return `
+                    <div class="form-field" data-field-id="${fieldId}">
+                        <label for="field_${fieldId}" class="form-label">
+                            ${field.label} ${requiredMark}
+                        </label>
+                        ${fieldHtml}
+                        ${field.helpText ? `<div class="form-text">${field.helpText}</div>` : ''}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+            }
+            
+            initializeFieldInteractions() {
+                // File upload buttons
+                document.querySelectorAll('.file-upload-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.currentFieldId = e.target.dataset.fieldId;
+                        const modal = new bootstrap.Modal(document.getElementById('fileUploadModal'));
+                        modal.show();
+                    });
+                });
+                
+                // Remove file buttons
+                document.querySelectorAll('.remove-file-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const fieldId = e.target.dataset.fieldId;
+                        this.removeFile(fieldId);
+                    });
+                });
+                
+                // Signature buttons
+                document.querySelectorAll('.signature-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.currentFieldId = e.target.dataset.fieldId;
+                        this.initSignaturePad();
+                        const modal = new bootstrap.Modal(document.getElementById('signatureModal'));
+                        modal.show();
+                    });
+                });
+                
+                // Remove signature buttons
+                document.querySelectorAll('.remove-signature-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const fieldId = e.target.dataset.fieldId;
+                        this.removeSignature(fieldId);
+                    });
+                });
+                
+                // Rating stars
+                document.querySelectorAll('.rating-field').forEach(field => {
+                    const stars = field.querySelectorAll('.rating-star');
+                    const fieldId = field.dataset.fieldId;
+                    
+                    stars.forEach(star => {
+                        star.addEventListener('click', () => {
+                            const rating = parseInt(star.dataset.rating);
+                            this.setRating(fieldId, rating);
+                        });
+                        
+                        star.addEventListener('mouseenter', () => {
+                            this.highlightRating(fieldId, parseInt(star.dataset.rating));
+                        });
+                    });
+                    
+                    field.addEventListener('mouseleave', () => {
+                        const currentRating = document.getElementById(`field_${fieldId}`).value;
+                        this.highlightRating(fieldId, parseInt(currentRating) || 0);
+                    });
+                });
+            }
+            
+            setupEventListeners() {
+                // Form submission
+                document.getElementById('responseForm').addEventListener('submit', (e) => {
+                    this.handleFormSubmit(e);
+                });
+                
+                // Submit another response
+                document.getElementById('submitAnotherBtn').addEventListener('click', () => {
+                    this.resetForm();
+                });
+                
+                // File upload modal
+                this.setupFileUploadModal();
+                
+                // Signature modal
+                this.setupSignatureModal();
+            }
+            
+            setupFileUploadModal() {
+                const uploadArea = document.getElementById('uploadArea');
+                const fileInput = document.getElementById('fileInput');
+                
+                uploadArea.addEventListener('click', () => fileInput.click());
+                
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('drag-over');
+                });
+                
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('drag-over');
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('drag-over');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.handleFileSelect(files[0]);
+                    }
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.handleFileSelect(e.target.files[0]);
+                    }
+                });
+                
+                document.getElementById('removeFileBtn').addEventListener('click', () => {
+                    this.clearFileUpload();
+                });
+                
+                document.getElementById('confirmUploadBtn').addEventListener('click', () => {
+                    this.confirmFileUpload();
+                });
+            }
+            
+            setupSignatureModal() {
+                document.getElementById('clearSignatureBtn').addEventListener('click', () => {
+                    this.clearSignature();
+                });
+                
+                document.getElementById('saveSignatureBtn').addEventListener('click', () => {
+                    this.saveSignature();
+                });
+            }
+            
+            async handleFormSubmit(e) {
+                e.preventDefault();
+                
+                try {
+                    const formData = this.collectFormData();
+                    
+                    if (!this.validateForm(formData)) {
+                        return;
+                    }
+                    
+                    const submitBtn = document.getElementById('submitBtn');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                    submitBtn.disabled = true;
+                    
+                    await window.api.post(`/forms/${this.formId}/submit`, {
+                        responses: formData
+                    });
+                    
+                    this.showSuccess();
+                } catch (error) {
+                    console.error('Form submission failed:', error);
+                    window.utils.toast.error(error.message || 'Failed to submit form');
+                    
+                    const submitBtn = document.getElementById('submitBtn');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+            
+            collectFormData() {
+                const formData = {};
+                const form = document.getElementById('responseForm');
+                const formDataObj = new FormData(form);
+                
+                // Collect regular form fields
+                for (const [name, value] of formDataObj.entries()) {
+                    if (name.startsWith('field_')) {
+                        const fieldId = name.replace('field_', '').replace('[]', '');
+                        
+                        if (name.endsWith('[]')) {
+                            // Checkbox group
+                            if (!formData[fieldId]) {
+                                formData[fieldId] = [];
+                            }
+                            formData[fieldId].push(value);
+                        } else {
+                            formData[fieldId] = value;
+                        }
+                    }
+                }
+                
+                // Add uploaded files
+                for (const [fieldId, fileData] of this.uploadedFiles) {
+                    formData[fieldId] = fileData;
+                }
+                
+                // Add signatures
+                for (const [fieldId, signatureData] of this.signatures) {
+                    formData[fieldId] = signatureData;
+                }
+                
+                return formData;
+            }
+            
+            validateForm(formData) {
+                let isValid = true;
+                const fields = this.formData.fields || [];
+                
+                fields.forEach(field => {
+                    if (field.required && ['heading', 'paragraph', 'divider', 'spacer'].indexOf(field.type) === -1) {
+                        const value = formData[field.id];
+                        
+                        if (!value || (Array.isArray(value) && value.length === 0) || 
+                            (typeof value === 'string' && value.trim() === '')) {
+                            
+                            const fieldElement = document.querySelector(`[data-field-id="${field.id}"]`);
+                            if (fieldElement) {
+                                fieldElement.classList.add('is-invalid');
+                                const feedback = fieldElement.querySelector('.invalid-feedback');
+                                if (feedback) {
+                                    feedback.textContent = 'This field is required';
+                                }
+                            }
+                            isValid = false;
+                        }
+                    }
+                });
+                
+                return isValid;
+            }
+            
+            showSuccess() {
+                document.getElementById('formCard').style.display = 'none';
+                document.getElementById('successCard').style.display = 'block';
+                
+                // Update success message
+                const successMessage = this.formData.settings?.successMessage || 
+                    'Your response has been submitted successfully.';
+                document.getElementById('successMessage').textContent = successMessage;
+                
+                // Show submit another button if multiple submissions are allowed
+                if (this.formData.settings?.allowMultipleSubmissions) {
+                    document.getElementById('submitAnotherBtn').style.display = 'inline-block';
+                }
+                
+                // Redirect if specified
+                if (this.formData.settings?.redirectUrl) {
+                    setTimeout(() => {
+                        window.location.href = this.formData.settings.redirectUrl;
+                    }, 2000);
+                }
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            resetForm() {
+                document.getElementById('responseForm').reset();
+                document.getElementById('formCard').style.display = 'block';
+                document.getElementById('successCard').style.display = 'none';
+                
+                // Clear uploaded files and signatures
+                this.uploadedFiles.clear();
+                this.signatures.clear();
+                
+                // Reset file upload displays
+                document.querySelectorAll('.file-upload-info').forEach(info => {
+                    info.style.display = 'none';
+                });
+                
+                // Reset signature displays
+                document.querySelectorAll('.signature-preview').forEach(preview => {
+                    preview.style.display = 'none';
+                });
+                
+                // Reset ratings
+                document.querySelectorAll('.rating-field').forEach(field => {
+                    const stars = field.querySelectorAll('.rating-star i');
+                    stars.forEach(star => {
+                        star.className = 'far fa-star';
+                    });
+                });
+                
+                // Clear validation states
+                document.querySelectorAll('.is-invalid').forEach(element => {
+                    element.classList.remove('is-invalid');
+                });
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            handleFileSelect(file) {
+                if (file.size > 10 * 1024 * 1024) {
+                    window.utils.toast.error('File size must be less than 10MB');
+                    return;
+                }
+                
+                // Show file info
+                document.getElementById('uploadedFileName').textContent = file.name;
+                document.getElementById('uploadedFileSize').textContent = window.utils.formatFileSize(file.size);
+                document.getElementById('uploadedFile').style.display = 'block';
+                document.getElementById('confirmUploadBtn').disabled = false;
+                
+                // Store file for upload
+                this.currentFile = file;
+            }
+            
+            clearFileUpload() {
+                document.getElementById('uploadedFile').style.display = 'none';
+                document.getElementById('confirmUploadBtn').disabled = true;
+                document.getElementById('fileInput').value = '';
+                this.currentFile = null;
+            }
+            
+            async confirmFileUpload() {
+                if (!this.currentFile || !this.currentFieldId) return;
+                
+                try {
+                    // Show upload progress
+                    document.getElementById('uploadProgress').style.display = 'block';
+                    
+                    const formData = new FormData();
+                    formData.append('file', this.currentFile);
+                    
+                    const response = await window.api.post('/upload', formData, {
+                        onUploadProgress: (progressEvent) => {
+                            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                            document.getElementById('uploadProgressBar').style.width = percentCompleted + '%';
+                            document.getElementById('uploadProgressText').textContent = `Uploading... ${percentCompleted}%`;
+                        }
+                    });
+                    
+                    // Store file data
+                    this.uploadedFiles.set(this.currentFieldId, {
+                        filename: response.filename,
+                        originalName: this.currentFile.name,
+                        size: this.currentFile.size,
+                        url: response.url
+                    });
+                    
+                    // Update field display
+                    const fileInfo = document.getElementById(`fileInfo_${this.currentFieldId}`);
+                    fileInfo.querySelector('.file-name').textContent = this.currentFile.name;
+                    fileInfo.style.display = 'block';
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('fileUploadModal'));
+                    modal.hide();
+                    
+                    // Reset modal state
+                    this.clearFileUpload();
+                    document.getElementById('uploadProgress').style.display = 'none';
+                    
+                } catch (error) {
+                    console.error('File upload failed:', error);
+                    window.utils.toast.error('File upload failed');
+                }
+            }
+            
+            removeFile(fieldId) {
+                this.uploadedFiles.delete(fieldId);
+                const fileInfo = document.getElementById(`fileInfo_${fieldId}`);
+                fileInfo.style.display = 'none';
+            }
+            
+            initSignaturePad() {
+                const canvas = document.getElementById('signaturePad');
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas size
+                canvas.width = canvas.offsetWidth;
+                canvas.height = 200;
+                
+                let isDrawing = false;
+                let lastX = 0;
+                let lastY = 0;
+                
+                const startDrawing = (e) => {
+                    isDrawing = true;
+                    const rect = canvas.getBoundingClientRect();
+                    lastX = (e.clientX || e.touches[0].clientX) - rect.left;
+                    lastY = (e.clientY || e.touches[0].clientY) - rect.top;
+                };
+                
+                const draw = (e) => {
+                    if (!isDrawing) return;
+                    
+                    const rect = canvas.getBoundingClientRect();
+                    const currentX = (e.clientX || e.touches[0].clientX) - rect.left;
+                    const currentY = (e.clientY || e.touches[0].clientY) - rect.top;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(currentX, currentY);
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                    
+                    lastX = currentX;
+                    lastY = currentY;
+                };
+                
+                const stopDrawing = () => {
+                    isDrawing = false;
+                };
+                
+                // Mouse events
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+                
+                // Touch events
+                canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    startDrawing(e);
+                });
+                canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    draw(e);
+                });
+                canvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    stopDrawing();
+                });
+                
+                this.signaturePad = { canvas, ctx };
+            }
+            
+            clearSignature() {
+                if (this.signaturePad) {
+                    const { canvas, ctx } = this.signaturePad;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            
+            saveSignature() {
+                if (!this.signaturePad || !this.currentFieldId) return;
+                
+                const { canvas } = this.signaturePad;
+                const dataURL = canvas.toDataURL('image/png');
+                
+                // Store signature data
+                this.signatures.set(this.currentFieldId, {
+                    dataURL: dataURL,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Update field display
+                const preview = document.getElementById(`signaturePreview_${this.currentFieldId}`);
+                preview.querySelector('.signature-image').src = dataURL;
+                preview.style.display = 'block';
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('signatureModal'));
+                modal.hide();
+            }
+            
+            removeSignature(fieldId) {
+                this.signatures.delete(fieldId);
+                const preview = document.getElementById(`signaturePreview_${fieldId}`);
+                preview.style.display = 'none';
+            }
+            
+            setRating(fieldId, rating) {
+                document.getElementById(`field_${fieldId}`).value = rating;
+                this.highlightRating(fieldId, rating);
+            }
+            
+            highlightRating(fieldId, rating) {
+                const field = document.querySelector(`[data-field-id="${fieldId}"]`);
+                const stars = field.querySelectorAll('.rating-star i');
+                
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.className = 'fas fa-star';
+                    } else {
+                        star.className = 'far fa-star';
+                    }
+                });
+            }
+            
+            updateFormStats() {
+                // This would typically fetch and display form statistics
+                // For now, we'll just show a placeholder
+                const stats = document.getElementById('formStats');
+                if (stats) {
+                    stats.textContent = 'Powered by Survey Builder';
+                }
+            }
+            
+            isLoggedIn() {
+                return !!localStorage.getItem('token');
+            }
+            
+            showError(message) {
+                document.getElementById('formCard').style.display = 'none';
+                document.getElementById('formUnavailableAlert').style.display = 'block';
+                document.getElementById('unavailableMessage').textContent = message;
+            }
+        }
+    </script>
+</body>
+</html>

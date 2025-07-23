@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications - Survey Builder</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/forms.css" rel="stylesheet">
+    <link href="/css/auth.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard.html">
+                <i class="fas fa-poll-h"></i>
+                Survey Builder
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/apps.html">
+                            <i class="fas fa-th-large"></i> Applications
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/forms.html">
+                            <i class="fas fa-file-alt"></i> Forms
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users.html">
+                            <i class="fas fa-users"></i> Users
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Global Search -->
+                <div class="d-flex me-3">
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="globalSearch" placeholder="Search..." style="width: 250px;">
+                        <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted"></i>
+                        <div id="globalSearchResults" class="search-results"></div>
+                    </div>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                        <img id="userAvatar" src="" alt="User" class="rounded-circle me-2" width="32" height="32">
+                        <span id="userName">Loading...</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="/settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="window.auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Breadcrumbs -->
+        <div id="breadcrumbs" class="mb-4"></div>
+        
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">
+                        <i class="fas fa-th-large"></i>
+                        Applications
+                    </h1>
+                    <p class="page-description text-muted">Manage applications and their configurations</p>
+                </div>
+                <div class="col-auto">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary" id="viewModeGrid" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary active" id="viewModeList" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-primary ms-2" data-action="create-app">
+                        <i class="fas fa-plus"></i> Create Application
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="searchApps" placeholder="Search applications...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="statusFilter">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="sortBy">
+                            <option value="createdAt">Created</option>
+                            <option value="name">Name</option>
+                            <option value="updatedAt">Updated</option>
+                            <option value="userCount">Users</option>
+                            <option value="formCount">Forms</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="sortOrder">
+                            <option value="desc">Desc</option>
+                            <option value="asc">Asc</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" id="refreshApps">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div id="bulkActions" class="alert alert-info" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-check-square"></i>
+                    <span id="selectedCount">0</span> application(s) selected
+                </span>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-success" data-action="bulk-activate">
+                        <i class="fas fa-check"></i> Activate
+                    </button>
+                    <button class="btn btn-outline-warning" data-action="bulk-deactivate">
+                        <i class="fas fa-ban"></i> Deactivate
+                    </button>
+                    <button class="btn btn-outline-danger" data-action="bulk-delete">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Container -->
+        <div class="card">
+            <div class="card-body">
+                <div id="appsContainer">
+                    <!-- Applications will be loaded here -->
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading applications...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination and Results Info -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div id="resultsInfo" class="text-muted">
+                <!-- Results info will be displayed here -->
+            </div>
+            <div id="pagination">
+                <!-- Pagination will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Application Modal -->
+    <div class="modal fade" id="createAppModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus"></i> Create Application
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createAppForm">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="createAppName" class="form-label">Application Name *</label>
+                                <input type="text" class="form-control" id="createAppName" name="name" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <label for="createAppDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="createAppDescription" name="description" rows="3" placeholder="Brief description of the application"></textarea>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createAppIcon" class="form-label">Icon (Font Awesome class)</label>
+                                <input type="text" class="form-control" id="createAppIcon" name="icon" placeholder="fas fa-th-large">
+                                <small class="form-text text-muted">Example: fas fa-chart-bar, fas fa-users, etc.</small>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createAppColor" class="form-label">Theme Color</label>
+                                <input type="color" class="form-control form-control-color" id="createAppColor" name="color" value="#0d6efd">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="createAppIsActive" name="isActive" checked>
+                                    <label class="form-check-label" for="createAppIsActive">
+                                        Active Application
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Settings</label>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="allowPublicForms" name="allowPublicForms">
+                                            <label class="form-check-label" for="allowPublicForms">
+                                                Allow Public Forms
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="requireApproval" name="requireApproval">
+                                            <label class="form-check-label" for="requireApproval">
+                                                Require Form Approval
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="enableAnalytics" name="enableAnalytics" checked>
+                                            <label class="form-check-label" for="enableAnalytics">
+                                                Enable Analytics
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="enableNotifications" name="enableNotifications" checked>
+                                            <label class="form-check-label" for="enableNotifications">
+                                                Enable Notifications
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Application Modal -->
+    <div class="modal fade" id="editAppModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit"></i> Edit Application
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editAppForm">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="editAppName" class="form-label">Application Name *</label>
+                                <input type="text" class="form-control" id="editAppName" name="name" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <label for="editAppDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="editAppDescription" name="description" rows="3" placeholder="Brief description of the application"></textarea>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editAppIcon" class="form-label">Icon (Font Awesome class)</label>
+                                <input type="text" class="form-control" id="editAppIcon" name="icon" placeholder="fas fa-th-large">
+                                <small class="form-text text-muted">Example: fas fa-chart-bar, fas fa-users, etc.</small>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editAppColor" class="form-label">Theme Color</label>
+                                <input type="color" class="form-control form-control-color" id="editAppColor" name="color" value="#0d6efd">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editAppIsActive" name="isActive">
+                                    <label class="form-check-label" for="editAppIsActive">
+                                        Active Application
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Settings</label>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editAllowPublicForms" name="allowPublicForms">
+                                            <label class="form-check-label" for="editAllowPublicForms">
+                                                Allow Public Forms
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editRequireApproval" name="requireApproval">
+                                            <label class="form-check-label" for="editRequireApproval">
+                                                Require Form Approval
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editEnableAnalytics" name="enableAnalytics">
+                                            <label class="form-check-label" for="editEnableAnalytics">
+                                                Enable Analytics
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="editEnableNotifications" name="enableNotifications">
+                                            <label class="form-check-label" for="editEnableNotifications">
+                                                Enable Notifications
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Users Modal -->
+    <div class="modal fade" id="manageUsersModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-users"></i> Manage Application Users
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="searchAppUsers" placeholder="Search users...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="appUserRoleFilter">
+                                <option value="all">All Roles</option>
+                                <option value="view">View</option>
+                                <option value="edit">Edit</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary" data-action="add-app-user">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        </div>
+                    </div>
+                    <div id="appUsersContainer">
+                        <!-- App users will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User to App Modal -->
+    <div class="modal fade" id="addUserToAppModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus"></i> Add User to Application
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addUserToAppForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="selectUser" class="form-label">Select User *</label>
+                            <select class="form-select" id="selectUser" name="userId" required>
+                                <option value="">Choose a user...</option>
+                                <!-- Users will be loaded dynamically -->
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="selectRole" class="form-label">Role *</label>
+                            <select class="form-select" id="selectRole" name="role" required>
+                                <option value="">Choose a role...</option>
+                                <option value="view">View - Can view forms and responses</option>
+                                <option value="edit">Edit - Can create and edit forms</option>
+                                <option value="admin">Admin - Full access to application</option>
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationTitle">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmationMessage">Are you sure you want to perform this action?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmationConfirm">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/apps.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

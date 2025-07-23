@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Survey Builder</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/forms.css" rel="stylesheet">
+    <link href="/css/auth.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard.html">
+                <i class="fas fa-poll-h"></i>
+                Survey Builder
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/apps.html">
+                            <i class="fas fa-th-large"></i> Applications
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/forms.html">
+                            <i class="fas fa-file-alt"></i> Forms
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users.html">
+                            <i class="fas fa-users"></i> Users
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Global Search -->
+                <div class="d-flex me-3">
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="globalSearch" placeholder="Search..." style="width: 250px;">
+                        <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted"></i>
+                        <div id="globalSearchResults" class="search-results"></div>
+                    </div>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                        <img id="userAvatar" src="" alt="User" class="rounded-circle me-2" width="32" height="32">
+                        <span id="userName">Loading...</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="/settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="window.auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Breadcrumbs -->
+        <div id="breadcrumbs" class="mb-4"></div>
+        
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </h1>
+                    <p class="page-description text-muted">Welcome back! Here's what's happening with your forms.</p>
+                </div>
+                <div class="col-auto">
+                    <div class="btn-group">
+                        <select class="form-select" id="periodFilter">
+                            <option value="7">Last 7 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                            <option value="365">Last year</option>
+                        </select>
+                    </div>
+                    <div class="btn-group ms-2">
+                        <select class="form-select" id="appFilter">
+                            <option value="all">All Applications</option>
+                            <!-- Options will be loaded dynamically -->
+                        </select>
+                    </div>
+                    <button class="btn btn-outline-secondary ms-2" id="refreshDashboard">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-bolt"></i> Quick Actions
+                        </h6>
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100" data-action="create-form">
+                                    <i class="fas fa-plus"></i> Create Form
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-primary w-100" data-action="create-user">
+                                    <i class="fas fa-user-plus"></i> Add User
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-primary w-100" data-action="create-app">
+                                    <i class="fas fa-th-large"></i> New Application
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-secondary w-100" data-action="view-analytics">
+                                    <i class="fas fa-chart-line"></i> View Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Forms</h6>
+                                <h3 class="card-title mb-0" id="totalForms">-</h3>
+                                <small class="text-success" id="formsChange">-</small>
+                            </div>
+                            <div class="stats-icon bg-primary">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Responses</h6>
+                                <h3 class="card-title mb-0" id="totalResponses">-</h3>
+                                <small class="text-success" id="responsesChange">-</small>
+                            </div>
+                            <div class="stats-icon bg-success">
+                                <i class="fas fa-reply"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Active Users</h6>
+                                <h3 class="card-title mb-0" id="activeUsers">-</h3>
+                                <small class="text-success" id="usersChange">-</small>
+                            </div>
+                            <div class="stats-icon bg-info">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Applications</h6>
+                                <h3 class="card-title mb-0" id="totalApps">-</h3>
+                                <small class="text-success" id="appsChange">-</small>
+                            </div>
+                            <div class="stats-icon bg-warning">
+                                <i class="fas fa-th-large"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-chart-line"></i> Forms & Responses Over Time
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="formsResponsesChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-chart-pie"></i> Form Status Distribution
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="formStatusChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Row -->
+        <div class="row">
+            <!-- Recent Activity -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-clock"></i> Recent Activity
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentActivity">
+                            <div class="text-center py-3">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Forms -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-star"></i> Top Performing Forms
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="topForms">
+                            <div class="text-center py-3">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Forms Section (for non-admin users) -->
+        <div class="row mt-4" id="myFormsSection" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-file-alt"></i> My Forms
+                            </h6>
+                            <a href="/forms.html" class="btn btn-sm btn-outline-primary">
+                                View All <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="myForms">
+                            <div class="text-center py-3">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Form Modal -->
+    <div class="modal fade" id="createFormModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus"></i> Create New Form
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createFormForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="formTitle" class="form-label">Form Title *</label>
+                            <input type="text" class="form-control" id="formTitle" name="title" required placeholder="Enter form title">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="formDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="formDescription" name="description" rows="3" placeholder="Brief description of the form"></textarea>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="formApplication" class="form-label">Application *</label>
+                            <select class="form-select" id="formApplication" name="applicationId" required>
+                                <option value="">Select Application</option>
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="formIsPublic" name="isPublic">
+                                <label class="form-check-label" for="formIsPublic">
+                                    Public Form (accessible without login)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create & Edit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus"></i> Create User
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createUserForm">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="createFirstName" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="createFirstName" name="firstName" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createLastName" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="createLastName" name="lastName" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <label for="createEmail" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="createEmail" name="email" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createPassword" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="createPassword" name="password" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createRole" class="form-label">Role *</label>
+                                <select class="form-select" id="createRole" name="role" required>
+                                    <option value="">Select Role</option>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="super_admin">Super Admin</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="createIsActive" name="isActive" checked>
+                                    <label class="form-check-label" for="createIsActive">
+                                        Active User
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Application Access</label>
+                                <div id="createUserAppAccess" class="app-access-container">
+                                    <!-- App access options will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Application Modal -->
+    <div class="modal fade" id="createAppModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus"></i> Create Application
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createAppForm">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="createAppName" class="form-label">Application Name *</label>
+                                <input type="text" class="form-control" id="createAppName" name="name" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <label for="createAppDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="createAppDescription" name="description" rows="3" placeholder="Brief description of the application"></textarea>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createAppIcon" class="form-label">Icon (Font Awesome class)</label>
+                                <input type="text" class="form-control" id="createAppIcon" name="icon" placeholder="fas fa-th-large">
+                                <small class="form-text text-muted">Example: fas fa-chart-bar, fas fa-users, etc.</small>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createAppColor" class="form-label">Theme Color</label>
+                                <input type="color" class="form-control form-control-color" id="createAppColor" name="color" value="#0d6efd">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="createAppIsActive" name="isActive" checked>
+                                    <label class="form-check-label" for="createAppIsActive">
+                                        Active Application
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Date-fns -->
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
