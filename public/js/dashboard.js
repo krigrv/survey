@@ -3,7 +3,7 @@
 class DashboardManager {
   constructor() {
     this.charts = {};
-    this.currentPeriod = '30d';
+    this.currentPeriod = '30';
     this.currentAppFilter = 'all';
     this.refreshInterval = null;
     this.init();
@@ -27,6 +27,10 @@ class DashboardManager {
   }
 
   initializeDashboard() {
+    console.log('Initializing dashboard...');
+    console.log('DOM ready state:', document.readyState);
+    console.log('API client available:', !!window.api);
+    
     // Initialize chart containers
     this.initializeCharts();
     
@@ -38,6 +42,13 @@ class DashboardManager {
     
     // Setup refresh button
     this.setupRefreshButton();
+    
+    // Check if required DOM elements exist
+    const requiredElements = ['totalForms', 'totalResponses', 'activeUsers', 'totalApps'];
+    requiredElements.forEach(id => {
+      const element = document.getElementById(id);
+      console.log(`Element ${id}:`, element ? 'found' : 'NOT FOUND');
+    });
   }
 
   setupEventListeners() {
@@ -104,17 +115,24 @@ class DashboardManager {
 
   async loadDashboardData(forceRefresh = false) {
     try {
+      console.log('Loading dashboard data...');
       // Show loading state
       this.showLoadingState();
 
       // Load overview data
       const overviewPromise = window.api.getDashboardOverview();
       
+      // Build params for stats and analytics (only include appId if it's not 'all')
+      const statsParams = { period: this.currentPeriod };
+      const analyticsParams = { period: this.currentPeriod };
+      
+      if (this.currentAppFilter !== 'all') {
+        statsParams.appId = this.currentAppFilter;
+        analyticsParams.appId = this.currentAppFilter;
+      }
+      
       // Load stats data
-      const statsPromise = window.api.getDashboardStats({
-        period: this.currentPeriod,
-        appId: this.currentAppFilter !== 'all' ? this.currentAppFilter : undefined
-      });
+      const statsPromise = window.api.getDashboardStats(statsParams);
       
       // Load recent activity
       const activityPromise = window.api.getRecentActivity({ limit: 10 });
@@ -123,10 +141,7 @@ class DashboardManager {
       const myFormsPromise = window.api.getMyForms({ limit: 5 });
       
       // Load analytics summary
-      const analyticsPromise = window.api.getAnalyticsSummary({
-        period: this.currentPeriod,
-        appId: this.currentAppFilter !== 'all' ? this.currentAppFilter : undefined
-      });
+      const analyticsPromise = window.api.getAnalyticsSummary(analyticsParams);
 
       // Wait for all data
       const [overview, stats, activity, myForms, analytics] = await Promise.all([
@@ -136,6 +151,8 @@ class DashboardManager {
         myFormsPromise,
         analyticsPromise
       ]);
+
+      console.log('Dashboard data loaded:', { overview, stats, activity, myForms, analytics });
 
       // Update UI with loaded data
       this.updateOverviewCards(overview);
@@ -152,40 +169,55 @@ class DashboardManager {
       
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
+      console.error('Error details:', error.message, error.stack);
       this.hideLoadingState();
       this.showErrorState();
+      
+      // Try to show what data we can get
+      try {
+        const overview = await window.api.getDashboardOverview();
+        console.log('Manual API test - overview data:', overview);
+        this.updateOverviewCards(overview);
+      } catch (fallbackError) {
+        console.error('Fallback API call also failed:', fallbackError);
+      }
     }
   }
 
   updateOverviewCards(data) {
+    console.log('Updating overview cards with data:', data);
     const cards = {
-      'total-forms': data.totalForms,
-      'total-responses': data.totalResponses,
-      'total-users': data.totalUsers,
-      'active-forms': data.activeForms
+      'totalForms': data.totalForms || 0,
+      'totalResponses': data.totalResponses || 0,
+      'activeUsers': data.activeForms || 0, // Using active forms as active users since we don't have user management
+      'totalApps': data.totalFormTypes || 0 // Using form types as applications/projects
     };
+    console.log('Card values:', cards);
 
     Object.entries(cards).forEach(([id, value]) => {
       const element = document.getElementById(id);
+      console.log(`Updating element ${id}:`, element, 'with value:', value);
       if (element) {
         this.animateNumber(element, value);
+        console.log(`Successfully updated ${id} to ${value}`);
+      } else {
+        console.error(`Element with ID ${id} not found in DOM`);
       }
     });
 
     // Update percentage changes if available
     const changes = {
-      'forms-change': data.formsChange,
-      'responses-change': data.responsesChange,
-      'users-change': data.usersChange,
-      'active-forms-change': data.activeFormsChange
+      'formsChange': data.recentFormsCount || 0,
+      'responsesChange': data.recentResponsesCount || 0,
+      'usersChange': 0, // No user management
+      'appsChange': 0 // No app management
     };
 
     Object.entries(changes).forEach(([id, change]) => {
       const element = document.getElementById(id);
-      if (element && change !== undefined) {
-        const isPositive = change >= 0;
-        element.textContent = `${isPositive ? '+' : ''}${change.toFixed(1)}%`;
-        element.className = `change ${isPositive ? 'positive' : 'negative'}`;
+      if (element) {
+        element.textContent = `+${change} this week`;
+        element.className = 'text-success';
       }
     });
   }
@@ -218,61 +250,55 @@ class DashboardManager {
   }
 
   updateRecentActivity(activities) {
-    const container = document.getElementById('recent-activity-list');
+    const container = document.getElementById('recentActivity');
     if (!container) return;
 
     if (!activities || activities.length === 0) {
-      container.innerHTML = '<div class="empty-state"><p>No recent activity</p></div>';
+      container.innerHTML = '<div class="text-center py-3"><p class="text-muted">No recent activity</p></div>';
       return;
     }
 
     container.innerHTML = activities.map(activity => `
-      <div class="activity-item">
-        <div class="activity-icon">
-          <i class="${this.getActivityIcon(activity.type)}"></i>
+      <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+        <div class="me-3">
+          <div class="rounded-circle bg-light p-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="${this.getActivityIcon(activity.type)} text-primary"></i>
+          </div>
         </div>
-        <div class="activity-content">
-          <div class="activity-title">${activity.title}</div>
-          <div class="activity-description">${activity.description}</div>
-          <div class="activity-time">${window.utils.formatRelativeTime(activity.createdAt)}</div>
+        <div class="flex-grow-1">
+          <div class="fw-medium">${activity.title}</div>
+          <small class="text-muted">${this.formatRelativeTime(activity.timestamp)}</small>
         </div>
-        ${activity.link ? `<a href="${activity.link}" class="activity-link"><i class="fas fa-external-link-alt"></i></a>` : ''}
       </div>
     `).join('');
   }
 
   updateMyForms(forms) {
-    const container = document.getElementById('my-forms-list');
+    const container = document.getElementById('topForms');
     if (!container) return;
 
     if (!forms || forms.length === 0) {
-      container.innerHTML = '<div class="empty-state"><p>No forms created yet</p></div>';
+      container.innerHTML = '<div class="text-center py-3"><p class="text-muted">No forms created yet</p></div>';
       return;
     }
 
     container.innerHTML = forms.map(form => `
-      <div class="form-item">
-        <div class="form-info">
-          <h6 class="form-title">
-            <a href="/forms.html?id=${form._id}">${form.title}</a>
-          </h6>
-          <div class="form-meta">
-            <span class="badge ${window.utils.getStatusColor(form.status)}">
-              ${window.utils.getStatusDisplayName(form.status)}
+      <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+        <div class="flex-grow-1">
+          <div class="fw-medium">
+            <a href="/form-viewer.html?id=${form._id}" class="text-decoration-none">${form.title}</a>
+          </div>
+          <div class="d-flex align-items-center mt-1">
+            <span class="badge bg-${this.getStatusColor(form.status)} me-2">
+              ${this.getStatusDisplayName(form.status)}
             </span>
-            <span class="form-responses">${form.responseCount || 0} responses</span>
-            <span class="form-date">${window.utils.formatRelativeTime(form.updatedAt)}</span>
+            <small class="text-muted">${form.responseCount || 0} responses</small>
           </div>
         </div>
-        <div class="form-actions">
-          <a href="/forms.html?id=${form._id}" class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-eye"></i>
+        <div class="text-end">
+          <a href="/form-builder.html?id=${form._id}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-edit"></i>
           </a>
-          ${this.canEditForm(form) ? `
-            <a href="/form-builder.html?id=${form._id}" class="btn btn-sm btn-outline-secondary">
-              <i class="fas fa-edit"></i>
-            </a>
-          ` : ''}
         </div>
       </div>
     `).join('');
@@ -481,38 +507,17 @@ class DashboardManager {
     const appFilter = document.getElementById('appFilter');
     if (!appFilter) return;
 
-    // Load available apps for filter
-    this.loadAppFilterOptions();
+    // App functionality removed - hide or disable app filter
+    appFilter.style.display = 'none';
+    const appFilterContainer = appFilter.closest('.filter-group');
+    if (appFilterContainer) {
+      appFilterContainer.style.display = 'none';
+    }
   }
 
   async loadAppFilterOptions() {
-    try {
-      const response = await window.api.getApps({ limit: 100 });
-      const appFilter = document.getElementById('appFilter');
-      
-      if (appFilter && response.apps) {
-        // Clear existing options except "All"
-        const allOption = appFilter.querySelector('option[value="all"]');
-        appFilter.innerHTML = '';
-        if (allOption) {
-          appFilter.appendChild(allOption);
-        } else {
-          appFilter.innerHTML = '<option value="all">All Applications</option>';
-        }
-
-        // Add app options
-        response.apps.forEach(app => {
-          const option = document.createElement('option');
-          option.value = app._id;
-          option.textContent = app.name;
-          appFilter.appendChild(option);
-        });
-
-        appFilter.value = this.currentAppFilter;
-      }
-    } catch (error) {
-      console.error('Failed to load app filter options:', error);
-    }
+    // App functionality removed - no longer needed
+    console.log('App filter functionality has been removed');
   }
 
   setupRefreshButton() {
@@ -600,32 +605,69 @@ class DashboardManager {
   }
 
   formatDuration(seconds) {
-    if (seconds < 60) {
-      return `${seconds}s`;
-    } else if (seconds < 3600) {
-      return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
-    } else {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
+    if (!seconds) return 'N/A';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
       return `${hours}h ${minutes}m`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${secs}s`;
+    } else {
+      return `${secs}s`;
+    }
+  }
+
+  formatRelativeTime(timestamp) {
+    if (!timestamp) return 'Unknown';
+    
+    const now = new Date();
+    const date = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return 'Just now';
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+  }
+
+  getStatusColor(status) {
+    switch (status) {
+      case 'published': return 'success';
+      case 'draft': return 'secondary';
+      case 'closed': return 'warning';
+      case 'archived': return 'dark';
+      default: return 'secondary';
+    }
+  }
+
+  getStatusDisplayName(status) {
+    switch (status) {
+      case 'published': return 'Published';
+      case 'draft': return 'Draft';
+      case 'closed': return 'Closed';
+      case 'archived': return 'Archived';
+      default: return status;
     }
   }
 
   canEditForm(form) {
-    const user = window.auth.getCurrentUser();
-    if (!user) return false;
-
-    // Owner can always edit
-    if (form.createdBy === user._id) return true;
-
-    // Super admin and admin can edit all forms
-    if (['super_admin', 'admin'].includes(user.role)) return true;
-
-    // App admin can edit forms in their app
-    return window.auth.hasAppAccess(form.appCode, 'admin');
+    // Authentication removed - all forms are now publicly editable
+    return true;
   }
 
   showCreateFormModal() {
+    // Authentication removed - form creation is now public
     const modal = document.getElementById('createFormModal');
     if (modal) {
       const bootstrapModal = new bootstrap.Modal(modal);
@@ -634,16 +676,8 @@ class DashboardManager {
   }
 
   showCreateUserModal() {
-    if (!window.auth.canManageUsers()) {
-      window.utils.toast.error('You do not have permission to create users');
-      return;
-    }
-
-    const modal = document.getElementById('createUserModal');
-    if (modal) {
-      const bootstrapModal = new bootstrap.Modal(modal);
-      bootstrapModal.show();
-    }
+    // User management removed - hide this functionality
+    console.log('User management functionality has been removed');
   }
 
   showCreateAppModal() {

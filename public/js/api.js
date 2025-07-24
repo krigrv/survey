@@ -3,31 +3,10 @@
 class APIClient {
   constructor() {
     this.baseURL = 'http://localhost:3001/api';
-    this.token = this.getToken();
-    this.refreshPromise = null;
-  }
-
-  // Token management
-  getToken() {
-    return localStorage.getItem('token');
-  }
-
-  setToken(token) {
-    this.token = token;
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
-    }
   }
 
   // HTTP request wrapper
   async request(endpoint, options = {}) {
-    // Handle dummy token for demo mode
-    if (this.token && this.token.startsWith('dummy-jwt-token-')) {
-      return this.handleDummyRequest(endpoint, options);
-    }
-    
     const url = `${this.baseURL}${endpoint}`;
     const config = {
       headers: {
@@ -37,11 +16,6 @@ class APIClient {
       ...options
     };
 
-    // Add authorization header if token exists
-    if (this.token && !config.skipAuth) {
-      config.headers.Authorization = `Bearer ${this.token}`;
-    }
-
     // Handle FormData
     if (config.body instanceof FormData) {
       delete config.headers['Content-Type'];
@@ -50,12 +24,7 @@ class APIClient {
     try {
       const response = await fetch(url, config);
       
-      // Handle 401 Unauthorized
-      if (response.status === 401 && !config.skipAuth && !endpoint.includes('/auth/')) {
-        return this.handleUnauthorized(endpoint, options);
-      }
-
-      // Handle other HTTP errors
+      // Handle HTTP errors
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({
           message: `HTTP ${response.status}: ${response.statusText}`
@@ -81,99 +50,7 @@ class APIClient {
     }
   }
 
-  // Handle dummy requests for demo mode
-  async handleDummyRequest(endpoint, options = {}) {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // Mock responses for different endpoints
-    if (endpoint.includes('/dashboard/overview')) {
-      return {
-        totalForms: 5,
-        totalResponses: 42,
-        activeUsers: 3,
-        recentActivity: []
-      };
-    }
-    
-    if (endpoint.includes('/auth/me') || endpoint.includes('/users/me')) {
-      return JSON.parse(localStorage.getItem('user') || '{}');
-    }
-    
-    if (endpoint.includes('/forms')) {
-      return {
-        forms: [],
-        total: 0,
-        page: 1,
-        limit: 10
-      };
-    }
-    
-    if (endpoint.includes('/users')) {
-      return {
-        users: [],
-        total: 0,
-        page: 1,
-        limit: 10
-      };
-    }
-    
-    // Default success response
-    return { success: true, message: 'Demo mode - operation simulated' };
-  }
 
-  // Handle unauthorized responses
-  async handleUnauthorized(originalEndpoint, originalOptions) {
-    // If already refreshing, wait for it
-    if (this.refreshPromise) {
-      try {
-        await this.refreshPromise;
-        return this.request(originalEndpoint, originalOptions);
-      } catch (error) {
-        this.logout();
-        throw new APIError('Session expired. Please login again.', 401);
-      }
-    }
-
-    // Try to refresh token
-    this.refreshPromise = this.refreshToken();
-    
-    try {
-      await this.refreshPromise;
-      this.refreshPromise = null;
-      return this.request(originalEndpoint, originalOptions);
-    } catch (error) {
-      this.refreshPromise = null;
-      this.logout();
-      throw new APIError('Session expired. Please login again.', 401);
-    }
-  }
-
-  // Refresh authentication token
-  async refreshToken() {
-    try {
-      const response = await this.request('/auth/refresh-token', {
-        method: 'POST',
-        skipAuth: false
-      });
-      
-      if (response.token) {
-        this.setToken(response.token);
-        return response;
-      }
-      
-      throw new Error('No token in refresh response');
-    } catch (error) {
-      this.setToken(null);
-      throw error;
-    }
-  }
-
-  // Logout and clear token
-  logout() {
-    this.setToken(null);
-    window.location.href = '/login.html';
-  }
 
   // HTTP method helpers
   async get(endpoint, params = {}) {
@@ -207,113 +84,11 @@ class APIClient {
     return this.request(endpoint, { method: 'DELETE' });
   }
 
-  // Authentication endpoints
-  async login(credentials) {
-    const response = await this.request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-      skipAuth: true
-    });
-    
-    if (response.token) {
-      this.setToken(response.token);
-    }
-    
-    return response;
-  }
 
-  async register(userData) {
-    return this.request('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(userData)
-    });
-  }
 
-  async setupSuperAdmin(setupData) {
-    return this.request('/auth/setup-super-admin', {
-      method: 'POST',
-      body: JSON.stringify(setupData),
-      skipAuth: true
-    });
-  }
 
-  async getCurrentUser() {
-    return this.get('/auth/me');
-  }
 
-  async updateProfile(profileData) {
-    return this.put('/auth/profile', profileData);
-  }
 
-  async changePassword(passwordData) {
-    return this.put('/auth/change-password', passwordData);
-  }
-
-  // User management endpoints
-  async getUsers(params = {}) {
-    return this.get('/users', params);
-  }
-
-  async getUser(userId) {
-    return this.get(`/users/${userId}`);
-  }
-
-  async createUser(userData) {
-    return this.post('/users', userData);
-  }
-
-  async updateUser(userId, userData) {
-    return this.put(`/users/${userId}`, userData);
-  }
-
-  async deleteUser(userId) {
-    return this.delete(`/users/${userId}`);
-  }
-
-  async resetUserPassword(userId, passwordData) {
-    return this.put(`/users/${userId}/reset-password`, passwordData);
-  }
-
-  async getUserStats() {
-    return this.get('/users/stats/overview');
-  }
-
-  // Application endpoints
-  async getApps(params = {}) {
-    return this.get('/apps', params);
-  }
-
-  async getApp(appId) {
-    return this.get(`/apps/${appId}`);
-  }
-
-  async createApp(appData) {
-    return this.post('/apps', appData);
-  }
-
-  async updateApp(appId, appData) {
-    return this.put(`/apps/${appId}`, appData);
-  }
-
-  async deleteApp(appId) {
-    return this.delete(`/apps/${appId}`);
-  }
-
-  async getAppUsers(appId, params = {}) {
-    return this.get(`/apps/${appId}/users`, params);
-  }
-
-  async addAppUser(appId, userData) {
-    return this.post(`/apps/${appId}/users`, userData);
-  }
-
-  async removeAppUser(appId, userId) {
-    return this.delete(`/apps/${appId}/users/${userId}`);
-  }
-
-  async getAppAnalytics(appId) {
-    return this.get(`/apps/${appId}/analytics`);
-  }
 
   // Form endpoints
   async getForms(params = {}) {
@@ -386,15 +161,15 @@ class APIClient {
   }
 
   async getRecentActivity(params = {}) {
-    return this.get('/dashboard/recent-activity', params);
+    return this.get('/dashboard/activity', params);
   }
 
   async getMyForms(params = {}) {
-    return this.get('/dashboard/my-forms', params);
+    return this.get('/dashboard/forms', params);
   }
 
   async getAnalyticsSummary(params = {}) {
-    return this.get('/dashboard/analytics-summary', params);
+    return this.get('/dashboard/analytics', params);
   }
 
   // File upload endpoints
@@ -610,13 +385,8 @@ window.handleFormSubmit = async (form, apiCall, options = {}) => {
 
 // Initialize API client when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if user is authenticated on protected pages
-  const isAuthPage = window.location.pathname.includes('login') || 
-                    window.location.pathname.includes('setup');
-  
-  if (!isAuthPage && !api.getToken()) {
-    window.location.href = '/login.html';
-  }
+  // Authentication removed - all pages are now public
+  console.log('API client initialized for public access');
 });
 
 // Handle network status changes

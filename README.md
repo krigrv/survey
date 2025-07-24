@@ -204,12 +204,6 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 ## 📚 API Endpoints
-
-### Authentication
-- `POST /api/auth/bypass-login` - Get auth token
-- `POST /api/auth/login` - User login
-- `POST /api/auth/register` - User registration
-
 ### Forms
 - `GET /api/forms` - Get all forms
 - `POST /api/forms` - Create form
@@ -238,7 +232,6 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 - **Helmet.js**: Security headers
 - **CORS**: Cross-origin resource sharing
-- **JWT**: Secure authentication
 - **Input Validation**: Express validator
 - **Environment Variables**: Secure configuration
 

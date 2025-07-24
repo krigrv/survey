@@ -468,33 +468,16 @@ class FormsManager {
   }
 
   async loadAppOptions() {
-    try {
-      const response = await window.api.getApps({ limit: 100 });
-      const appFilter = document.getElementById('appFilter');
-      
-      if (appFilter && response.apps) {
-        // Keep the "All" option
-        const allOption = appFilter.querySelector('option[value="all"]');
-        appFilter.innerHTML = '';
-        if (allOption) {
-          appFilter.appendChild(allOption);
-        } else {
-          appFilter.innerHTML = '<option value="all">All Applications</option>';
-        }
-
-        // Add app options based on user access
-        response.apps.forEach(app => {
-          if (window.auth.canAccessApp(app.code)) {
-            const option = document.createElement('option');
-            option.value = app._id;
-            option.textContent = app.name;
-            appFilter.appendChild(option);
-          }
-        });
+    // App functionality removed - hide app filter
+    const appFilter = document.getElementById('appFilter');
+    if (appFilter) {
+      appFilter.style.display = 'none';
+      const appFilterContainer = appFilter.closest('.filter-group');
+      if (appFilterContainer) {
+        appFilterContainer.style.display = 'none';
       }
-    } catch (error) {
-      console.error('Failed to load app options:', error);
     }
+    console.log('App filter functionality has been removed');
   }
 
   initializePagination() {
@@ -715,25 +698,15 @@ class FormsManager {
   }
 
   async loadCreateFormAppOptions() {
-    try {
-      const response = await window.api.getApps({ limit: 100 });
-      const appSelect = document.getElementById('createFormApp');
-      
-      if (appSelect && response.apps) {
-        appSelect.innerHTML = '<option value="">Select Application</option>';
-        
-        response.apps.forEach(app => {
-          if (window.auth.hasAppAccess(app.code, 'edit')) {
-            const option = document.createElement('option');
-            option.value = app._id;
-            option.textContent = app.name;
-            appSelect.appendChild(option);
-          }
-        });
+    // App functionality removed - hide app selection
+    const appSelect = document.getElementById('createFormApp');
+    if (appSelect) {
+      const appSelectContainer = appSelect.closest('.mb-3');
+      if (appSelectContainer) {
+        appSelectContainer.style.display = 'none';
       }
-    } catch (error) {
-      console.error('Failed to load app options for create form:', error);
     }
+    console.log('App selection functionality has been removed');
   }
 
   showCreateFormModal() {
@@ -844,31 +817,13 @@ class FormsManager {
   }
 
   canEditForm(form) {
-    const user = window.auth.getCurrentUser();
-    if (!user) return false;
-
-    // Owner can always edit
-    if (form.createdBy === user._id) return true;
-
-    // Super admin and admin can edit all forms
-    if (['super_admin', 'admin'].includes(user.role)) return true;
-
-    // App admin can edit forms in their app
-    return window.auth.hasAppAccess(form.appCode, 'admin');
+    // Authentication removed - all forms are now publicly editable
+    return true;
   }
 
   canDeleteForm(form) {
-    const user = window.auth.getCurrentUser();
-    if (!user) return false;
-
-    // Owner can always delete
-    if (form.createdBy === user._id) return true;
-
-    // Super admin and admin can delete all forms
-    if (['super_admin', 'admin'].includes(user.role)) return true;
-
-    // App admin can delete forms in their app
-    return window.auth.hasAppAccess(form.appCode, 'admin');
+    // Authentication removed - all forms are now publicly deletable
+    return true;
   }
 }
 

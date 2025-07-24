@@ -15,7 +15,7 @@
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
     <link href="/css/forms.css" rel="stylesheet">
-    <link href="/css/auth.css" rel="stylesheet">
+    <!-- Authentication CSS removed -->
 </head>
 <body>
     <!-- Loading Spinner -->
@@ -50,15 +50,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/forms.html">
+                        <a class="nav-link" href="/forms-list.html">
                             <i class="fas fa-file-alt"></i> Forms
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/users.html">
-                            <i class="fas fa-users"></i> Users
-                        </a>
-                    </li>
+                    <!-- Users page removed -->
                 </ul>
                 
                 <!-- Global Search -->
@@ -70,19 +66,7 @@
                     </div>
                 </div>
                 
-                <!-- User Menu -->
-                <div class="dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
-                        <img id="userAvatar" src="" alt="User" class="rounded-circle me-2" width="32" height="32">
-                        <span id="userName">Loading...</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
-                        <li><a class="dropdown-item" href="/settings.html"><i class="fas fa-cog"></i> Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="window.auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                    </ul>
-                </div>
+                <!-- User menu removed - authentication no longer required -->
             </div>
         </div>
     </nav>
@@ -139,9 +123,7 @@
                                 </button>
                             </div>
                             <div class="col-md-3">
-                                <button class="btn btn-outline-primary w-100" data-action="create-user">
-                                    <i class="fas fa-user-plus"></i> Add User
-                                </button>
+                                <!-- User management removed -->
                             </div>
                             <div class="col-md-3">
                                 <button class="btn btn-outline-primary w-100" data-action="create-app">
@@ -198,7 +180,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Active Users</h6>
+                                <h6 class="card-subtitle mb-2 text-muted">Active Forms</h6>
                                 <h3 class="card-title mb-0" id="activeUsers">-</h3>
                                 <small class="text-success" id="usersChange">-</small>
                             </div>
@@ -214,7 +196,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Applications</h6>
+                                <h6 class="card-subtitle mb-2 text-muted">Form Types</h6>
                                 <h3 class="card-title mb-0" id="totalApps">-</h3>
                                 <small class="text-success" id="appsChange">-</small>
                             </div>
@@ -516,7 +498,7 @@
     <!-- Custom JS -->
     <script src="/js/utils.js"></script>
     <script src="/js/api.js"></script>
-    <script src="/js/auth.js"></script>
+    <!-- Authentication script removed -->
     <script src="/js/dashboard.js"></script>
     <script src="/js/main.js"></script>
 </body>

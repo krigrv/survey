@@ -93,11 +93,8 @@
     <div class="app-selector">
         <div class="container text-center">
             <h2 class="mb-4">Select Application</h2>
-            <div class="app-buttons">
-                <button class="btn app-button" data-app-code="MYDHL+">MYDHL+</button>
-                <button class="btn app-button" data-app-code="GCCP">GCCP</button>
-                <button class="btn app-button" data-app-code="DEFAULT">Default</button>
-                <button class="btn app-button active" data-app-code="">All Forms</button>
+            <div class="app-buttons" id="app-buttons-container">
+                <!-- Dynamic form type buttons will be loaded here -->
             </div>
         </div>
     </div>
@@ -105,31 +102,80 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 id="forms-title">All Forms</h3>
-                    <div class="d-flex gap-2">
-                        <input type="text" id="search-input" class="form-control" placeholder="Search forms..." style="width: 250px;">
-                        <select id="status-filter" class="form-select" style="width: 150px;">
-                            <option value="">All Status</option>
-                            <option value="draft">Draft</option>
-                            <option value="published">Published</option>
-                            <option value="closed">Closed</option>
-                            <option value="archived">Archived</option>
-                        </select>
-                    </div>
-                </div>
+                <!-- Tab Navigation -->
+                <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="forms-tab" data-bs-toggle="tab" data-bs-target="#forms-panel" type="button" role="tab">
+                            <i class="fas fa-list"></i> Forms
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses-panel" type="button" role="tab">
+                            <i class="fas fa-chart-bar"></i> Responses
+                        </button>
+                    </li>
+                </ul>
 
-                <div id="forms-container">
-                    <div class="text-center">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                <!-- Tab Content -->
+                <div class="tab-content" id="mainTabContent">
+                    <!-- Forms Tab -->
+                    <div class="tab-pane fade show active" id="forms-panel" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 id="forms-title">All Forms</h3>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="search-input" class="form-control" placeholder="Search forms..." style="width: 250px;">
+                                <select id="status-filter" class="form-select" style="width: 150px;">
+                                    <option value="">All Status</option>
+                                    <option value="draft">Draft</option>
+                                    <option value="published">Published</option>
+                                    <option value="closed">Closed</option>
+                                    <option value="archived">Archived</option>
+                                </select>
+                            </div>
                         </div>
+
+                        <div id="forms-container">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <nav aria-label="Forms pagination" id="pagination-container" class="mt-4">
+                            <!-- Pagination will be inserted here -->
+                        </nav>
+                    </div>
+
+                    <!-- Responses Tab -->
+                    <div class="tab-pane fade" id="responses-panel" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3>Form Responses by Type</h3>
+                            <div class="d-flex gap-2">
+                                <select id="form-type-filter" class="form-select" style="width: 200px;">
+                                    <option value="">All Form Types</option>
+                                </select>
+                                <select id="response-status-filter" class="form-select" style="width: 150px;">
+                                    <option value="all">All Status</option>
+                                    <option value="submitted">Submitted</option>
+                                    <option value="draft">Draft</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="responses-container">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <nav aria-label="Responses pagination" id="responses-pagination-container" class="mt-4">
+                            <!-- Pagination will be inserted here -->
+                        </nav>
                     </div>
                 </div>
-
-                <nav aria-label="Forms pagination" id="pagination-container" class="mt-4">
-                    <!-- Pagination will be inserted here -->
-                </nav>
             </div>
         </div>
     </div>

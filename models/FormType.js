@@ -15,11 +15,7 @@ const formTypeSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
+  // createdBy removed - user references eliminated
   createdAt: {
     type: Date,
     default: Date.now
@@ -39,6 +35,6 @@ formTypeSchema.pre('save', function(next) {
 // Index for better query performance
 formTypeSchema.index({ name: 1 });
 formTypeSchema.index({ isActive: 1 });
-formTypeSchema.index({ createdBy: 1 });
+// createdBy index removed
 
 module.exports = mongoose.model('FormType', formTypeSchema);

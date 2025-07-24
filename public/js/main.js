@@ -19,9 +19,6 @@ class App {
       // Show loading
       window.utils.loading.show();
       
-      // Initialize authentication first
-      await this.initializeAuth();
-      
       // Determine current page
       this.currentPage = this.getCurrentPage();
       
@@ -46,14 +43,7 @@ class App {
     }
   }
 
-  async initializeAuth() {
-    // Wait for auth module to be ready
-    if (window.auth) {
-      await window.auth.initialize();
-    } else {
-      throw new Error('Authentication module not loaded');
-    }
-  }
+  // Authentication removed
 
   getCurrentPage() {
     const path = window.location.pathname;
@@ -213,20 +203,7 @@ class App {
     console.log('App analytics module not yet implemented');
   }
 
-  async initializeLogin() {
-    // Login is handled by auth module
-    console.log('Login page - auth module handles this');
-  }
-
-  async initializeSetup() {
-    // Setup is handled by auth module
-    console.log('Setup page - auth module handles this');
-  }
-
-  async initializeProfile() {
-    // Profile is handled by auth module
-    console.log('Profile page - auth module handles this');
-  }
+  // Authentication-related pages removed
 
   async initializeSettings() {
     // Settings will be implemented later

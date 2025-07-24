@@ -38,19 +38,15 @@ const responseSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  appId: {
+  formTypeId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'App',
-    required: true
+    ref: 'FormType'
   },
-  appName: {
-    type: String,
-    required: true
+  formTypeName: {
+    type: String
   },
-  respondentId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
+  // App references removed - forms are now independent
+  // respondentId removed - user references eliminated
   respondentEmail: {
     type: String,
     trim: true,
@@ -115,18 +111,12 @@ const responseSchema = new mongoose.Schema({
       default: false
     },
     flagReason: String,
-    reviewedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
+    // reviewedBy removed - user references eliminated
     reviewedAt: Date
   },
   notes: [{
     content: String,
-    addedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
+    // addedBy removed - user references eliminated
     addedAt: {
       type: Date,
       default: Date.now
@@ -143,8 +133,9 @@ const responseSchema = new mongoose.Schema({
 
 // Indexes for better performance
 responseSchema.index({ formId: 1, createdAt: -1 });
-responseSchema.index({ appId: 1, createdAt: -1 });
-responseSchema.index({ respondentId: 1 });
+responseSchema.index({ formTypeId: 1, createdAt: -1 });
+// App index removed
+// respondentId index removed
 responseSchema.index({ respondentEmail: 1 });
 responseSchema.index({ status: 1 });
 responseSchema.index({ 'timing.submittedAt': -1 });
@@ -227,7 +218,7 @@ responseSchema.methods.exportData = function() {
 // Static method to get analytics for a form
 responseSchema.statics.getFormAnalytics = async function(formId) {
   const pipeline = [
-    { $match: { formId: mongoose.Types.ObjectId(formId), status: 'submitted' } },
+    { $match: { formId: new mongoose.Types.ObjectId(formId), status: 'submitted' } },
     {
       $group: {
         _id: null,

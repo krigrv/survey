@@ -25,6 +25,12 @@ class GoogleFormsBuilder {
     this.loadFormTypes();
     this.loadFormFromURL();
     this.initializeFirstQuestion();
+    
+    // Initially disable publish button until form is saved
+    const publishBtn = document.getElementById('publishForm');
+    if (publishBtn) {
+      publishBtn.disabled = true;
+    }
   }
 
   setupEventListeners() {
@@ -42,6 +48,15 @@ class GoogleFormsBuilder {
     if (formDescription) {
       formDescription.addEventListener('input', (e) => {
         this.currentForm.description = e.target.value;
+        this.saveFormState();
+      });
+    }
+
+    // Form type dropdown
+    const formTypeSelect = document.getElementById('formType');
+    if (formTypeSelect) {
+      formTypeSelect.addEventListener('change', (e) => {
+        this.currentForm.formTypeId = e.target.value;
         this.saveFormState();
       });
     }
@@ -97,6 +112,9 @@ class GoogleFormsBuilder {
     // Add question button
     document.getElementById('addQuestionBtn')?.addEventListener('click', () => this.addQuestion());
 
+    // Project management
+    document.getElementById('saveProjectBtn')?.addEventListener('click', () => this.saveProject());
+
     // Floating toolbar buttons
     document.querySelectorAll('.toolbar-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -106,6 +124,32 @@ class GoogleFormsBuilder {
         }
       });
     });
+
+    // User assignment functionality
+    const addUserBtn = document.getElementById('addUserBtn');
+    const userEmailInput = document.getElementById('userEmailInput');
+    
+    if (addUserBtn) {
+      addUserBtn.addEventListener('click', () => {
+        this.addUserToProject();
+      });
+    }
+    
+    if (userEmailInput) {
+      userEmailInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.addUserToProject();
+        }
+      });
+    }
+
+    // Response form type dropdown
+    const responseFormTypeSelect = document.getElementById('responseFormTypeSelect');
+    if (responseFormTypeSelect) {
+      responseFormTypeSelect.addEventListener('change', (e) => {
+        this.loadFormsByType(e.target.value);
+      });
+    }
 
     // Setup question event listeners
     this.setupQuestionListeners();
@@ -153,7 +197,10 @@ class GoogleFormsBuilder {
         this.updateQuestionTitle(e.target);
       });
       input.addEventListener('focus', (e) => {
-        this.selectQuestion(e.target.closest('.question-card'));
+        const questionCard = e.target.closest('.question-card');
+        if (questionCard) {
+          this.selectQuestion(questionCard);
+        }
       });
     });
 
@@ -174,22 +221,34 @@ class GoogleFormsBuilder {
     // Add option functionality
     document.querySelectorAll('.add-option').forEach(element => {
       element.addEventListener('click', (e) => {
-        this.addOption(e.target.closest('.question-card'));
+        const questionCard = e.target.closest('.question-card');
+        if (questionCard) {
+          this.addOption(questionCard);
+        }
       });
     });
 
     // Delete option buttons
     document.querySelectorAll('.option-delete').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        this.deleteOption(e.target.closest('.option-item'));
+        const optionItem = e.target.closest('.option-item');
+        if (optionItem) {
+          this.deleteOption(optionItem);
+        }
       });
     });
 
     // Question action buttons
     document.querySelectorAll('.action-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const action = e.target.closest('button').getAttribute('title');
+        const button = e.target.closest('button');
         const questionCard = e.target.closest('.question-card');
+        
+        if (!button || !questionCard) {
+          return;
+        }
+        
+        const action = button.getAttribute('title');
         
         if (action === 'Duplicate') {
           this.duplicateQuestion(questionCard);
@@ -202,7 +261,10 @@ class GoogleFormsBuilder {
     // Required toggle
     document.querySelectorAll('.required-checkbox').forEach(checkbox => {
       checkbox.addEventListener('change', (e) => {
-        this.toggleRequired(e.target.closest('.question-card'), e.target.checked);
+        const questionCard = e.target.closest('.question-card');
+        if (questionCard) {
+          this.toggleRequired(questionCard, e.target.checked);
+        }
       });
     });
   }
@@ -258,7 +320,169 @@ class GoogleFormsBuilder {
           <span class="add-option-text">Add option or <span class="add-other-link">add "Other"</span></span>
         </div>
       `;
-    } else if (questionType === 'short-answer') {
+    } else {
+      // For other question types, use the updateQuestionOptions method
+      this.updateQuestionOptions(questionCard);
+    }
+    
+    // Re-setup listeners for new elements
+    this.setupQuestionListeners();
+  }
+
+  renderFormPreview(form) {
+    const container = document.getElementById('responsesContainer');
+    if (!container) return;
+    
+    const previewHtml = `
+      <div class="form-preview">
+        <div class="form-header">
+          <h2>${form.title}</h2>
+          <p>${form.description}</p>
+          <button class="btn btn-secondary back-to-list-btn">← Back to List</button>
+        </div>
+        <div class="form-questions">
+          ${form.questions ? form.questions.map(question => `
+            <div class="question-preview">
+              <h4>${question.title}</h4>
+              ${this.renderQuestionPreview(question)}
+            </div>
+          `).join('') : ''}
+        </div>
+      </div>
+    `;
+    
+    container.innerHTML = previewHtml;
+    
+    // Add event listener for back button
+    const backButton = container.querySelector('.back-to-list-btn');
+    if (backButton) {
+      backButton.addEventListener('click', () => {
+        const formTypeSelect = document.getElementById('responseFormTypeSelect');
+        if (formTypeSelect && formTypeSelect.value) {
+          this.loadFormsByType(formTypeSelect.value);
+        }
+      });
+    }
+
+    // Add event listener for embed code button
+    const embedButton = container.querySelector('.embed-code-btn');
+    const embedSection = container.querySelector('.embed-code-section');
+    const embedTextarea = container.querySelector('.embed-code-textarea');
+    const copyButton = container.querySelector('.copy-embed-btn');
+
+    if (embedButton && embedSection && embedTextarea) {
+      embedButton.addEventListener('click', () => {
+        const formId = embedButton.getAttribute('data-form-id');
+        const baseUrl = window.location.origin;
+        const embedCode = `<script type="text/javascript" src="${baseUrl}/popup/embed.js" data-form-id="${formId}"></script>`;
+        
+        embedTextarea.value = embedCode;
+        embedSection.style.display = embedSection.style.display === 'none' ? 'block' : 'none';
+      });
+    }
+
+    if (copyButton && embedTextarea) {
+      copyButton.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(embedTextarea.value);
+          const originalText = copyButton.innerHTML;
+          copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+          copyButton.classList.remove('btn-outline-secondary');
+          copyButton.classList.add('btn-success');
+          
+          setTimeout(() => {
+            copyButton.innerHTML = originalText;
+            copyButton.classList.remove('btn-success');
+            copyButton.classList.add('btn-outline-secondary');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy embed code:', err);
+          // Fallback for older browsers
+          embedTextarea.select();
+          document.execCommand('copy');
+        }
+      });
+    }
+  }
+
+  renderQuestionPreview(question) {
+    switch (question.type) {
+      case 'multiple-choice':
+      case 'radio':
+        return `
+          <div class="form-check-group">
+            ${question.options ? question.options.map(option => `
+              <div class="form-check">
+                <input class="form-check-input" type="radio" disabled>
+                <label class="form-check-label">${typeof option === 'object' ? (option.label || option.text || option.value) : option}</label>
+              </div>
+            `).join('') : ''}
+          </div>
+        `;
+      case 'checkboxes':
+      case 'checkbox':
+        return `
+          <div class="form-check-group">
+            ${question.options ? question.options.map(option => `
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" disabled>
+                <label class="form-check-label">${typeof option === 'object' ? (option.label || option.text || option.value) : option}</label>
+              </div>
+            `).join('') : ''}
+          </div>
+        `;
+      case 'dropdown':
+      case 'select':
+        return `
+          <select class="form-select" disabled>
+            <option>Choose...</option>
+            ${question.options ? question.options.map(option => `
+              <option>${typeof option === 'object' ? (option.label || option.text || option.value) : option}</option>
+            `).join('') : ''}
+          </select>
+        `;
+      case 'short-answer':
+        return `
+          <div class="text-input-preview">
+            <input type="text" placeholder="Short answer text" disabled>
+          </div>
+        `;
+      case 'paragraph':
+        return `
+          <div class="text-input-preview">
+            <textarea placeholder="Long answer text" disabled rows="3"></textarea>
+          </div>
+        `;
+      case 'linear-scale':
+        return `
+          <div class="scale-preview">
+            <span>1</span>
+            ${Array.from({length: 5}, (_, i) => `<input type="radio" disabled>`).join('')}
+            <span>5</span>
+          </div>
+        `;
+      case 'date':
+        return `
+          <div class="date-input-preview">
+            <input type="date" disabled>
+          </div>
+        `;
+      case 'time':
+        return `
+          <div class="time-input-preview">
+            <input type="time" disabled>
+          </div>
+        `;
+      default:
+        return '<div>Unsupported question type</div>';
+    }
+  }
+
+  updateQuestionOptions(questionCard) {
+    const optionsContainer = questionCard.querySelector('.question-options');
+    const questionType = questionCard.querySelector('.question-type-dropdown').value;
+    
+    if (questionType === 'short-answer') {
       optionsContainer.innerHTML = `
         <div class="text-input-preview">
           <input type="text" placeholder="Short answer text" disabled>
@@ -323,6 +547,10 @@ class GoogleFormsBuilder {
   }
 
   deleteOption(optionItem) {
+    if (!optionItem || !optionItem.parentElement) {
+      return;
+    }
+    
     const optionsContainer = optionItem.parentElement;
     const remainingOptions = optionsContainer.querySelectorAll('.option-item:not(.add-option)');
     
@@ -469,19 +697,263 @@ class GoogleFormsBuilder {
   showSettings() {
     // Show settings tab content
     console.log('Showing settings tab');
+    // Ensure form types are loaded when settings tab is shown
+    this.loadFormTypes();
+  }
+
+  clearForm() {
+    // Clear form title and description
+    const formTitle = document.getElementById('formTitle');
+    const formDescription = document.getElementById('formDescription');
+    if (formTitle) formTitle.value = '';
+    if (formDescription) formDescription.value = '';
+    
+    // Clear all questions
+    const questionsContainer = document.getElementById('formQuestions');
+    if (questionsContainer) {
+      questionsContainer.innerHTML = '';
+      this.initializeFirstQuestion();
+    }
+    
+    // Reset current form
+    this.currentForm = {
+      id: null,
+      title: 'Untitled form',
+      description: '',
+      questions: [],
+      settings: {
+        allowAnonymous: true,
+        requireLogin: false,
+        multipleSubmissions: false,
+        showProgressBar: true,
+        customTheme: 'default'
+      }
+    };
+  }
+
+  async loadFormsByType(formTypeId) {
+    const container = document.getElementById('responseFormsContainer');
+    
+    if (!formTypeId) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No forms found</h5>
+          <p class="text-muted">Select a form type above to view saved forms.</p>
+        </div>
+      `;
+      return;
+    }
+    
+    try {
+      const data = await api.get(`/form-types/${formTypeId}/forms`);
+      this.displayForms(data.forms || data);
+    } catch (error) {
+      console.error('Error loading forms by type:', error);
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+          <h5 class="text-muted">Error loading forms</h5>
+          <p class="text-muted">Failed to load forms for this type.</p>
+        </div>
+      `;
+    }
+  }
+
+  displayForms(forms) {
+    const container = document.getElementById('responseFormsContainer');
+    
+    if (!forms || forms.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No forms found</h5>
+          <p class="text-muted">No forms have been saved for this form type yet.</p>
+        </div>
+      `;
+      return;
+    }
+    
+    const formsHtml = forms.map(form => `
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">${form.title || 'Untitled Form'}</h5>
+          <p class="card-text">${form.description || 'No description'}</p>
+          <p class="text-muted small">Created: ${new Date(form.createdAt).toLocaleDateString()}</p>
+          <button class="btn btn-primary btn-sm view-form-btn" data-form-id="${form._id}">
+            <i class="fas fa-eye"></i> View Form
+          </button>
+        </div>
+      </div>
+    `).join('');
+    
+    container.innerHTML = formsHtml;
+    
+    // Add event listeners for view form buttons
+    container.querySelectorAll('.view-form-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const formId = e.target.closest('.view-form-btn').dataset.formId;
+        this.viewForm(formId);
+      });
+    });
+  }
+
+  async viewForm(formId) {
+    try {
+      const form = await api.getForm(formId);
+      this.renderFormPreview(form);
+    } catch (error) {
+      console.error('Error viewing form:', error);
+      this.showErrorMessage('Error loading form details');
+    }
+  }
+
+  renderFormPreview(form) {
+    const container = document.getElementById('responseFormsContainer');
+    
+    const previewHtml = `
+      <div class="form-preview">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4>Form Preview</h4>
+          <div>
+            <button class="btn btn-info btn-sm me-2 embed-code-btn" data-form-id="${form.id || form._id}">
+              <i class="fas fa-code"></i> Get Embed Code
+            </button>
+            <button class="btn btn-secondary back-to-list-btn">
+              <i class="fas fa-arrow-left"></i> Back to List
+            </button>
+          </div>
+        </div>
+        <div class="embed-code-section" style="display: none;">
+          <div class="card mb-3">
+            <div class="card-header">
+              <h6 class="mb-0"><i class="fas fa-code"></i> Embed Code</h6>
+            </div>
+            <div class="card-body">
+              <p class="text-muted small mb-2">Copy and paste this code into your website where you want the survey widget to appear:</p>
+              <div class="input-group">
+                <textarea class="form-control embed-code-textarea" rows="2" readonly></textarea>
+                <button class="btn btn-outline-secondary copy-embed-btn" type="button">
+                  <i class="fas fa-copy"></i> Copy
+                </button>
+              </div>
+              <small class="text-muted">The survey will appear as a popup widget after a few seconds when visitors load your page.</small>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h5>${form.title || 'Untitled Form'}</h5>
+            <p class="mb-0">${form.description || 'No description'}</p>
+          </div>
+          <div class="card-body">
+            ${form.questions && form.questions.length > 0 ? 
+              form.questions.map((question, index) => `
+                <div class="question-preview mb-4">
+                  <h6>${index + 1}. ${question.title}</h6>
+                  ${this.renderQuestionPreview(question)}
+                </div>
+              `).join('') : 
+              '<p class="text-muted">No questions in this form.</p>'
+            }
+          </div>
+        </div>
+      </div>
+    `;
+    
+    container.innerHTML = previewHtml;
+    
+    // Add event listener for back button
+    const backButton = container.querySelector('.back-to-list-btn');
+    if (backButton) {
+      backButton.addEventListener('click', () => {
+        const formTypeSelect = document.getElementById('responseFormTypeSelect');
+        if (formTypeSelect && formTypeSelect.value) {
+          this.loadFormsByType(formTypeSelect.value);
+        }
+      });
+    }
+  }
+
+  renderQuestionPreview(question) {
+    switch (question.type) {
+      case 'multiple-choice':
+      case 'radio':
+        return `
+          <div class="form-check-group">
+            ${question.options ? question.options.map(option => `
+              <div class="form-check">
+                <input class="form-check-input" type="radio" disabled>
+                <label class="form-check-label">${typeof option === 'object' ? (option.label || option.text || option.value) : option}</label>
+              </div>
+            `).join('') : ''}
+          </div>
+        `;
+      case 'checkboxes':
+      case 'checkbox':
+        return `
+          <div class="form-check-group">
+            ${question.options ? question.options.map(option => `
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" disabled>
+                <label class="form-check-label">${typeof option === 'object' ? (option.label || option.text || option.value) : option}</label>
+              </div>
+            `).join('') : ''}
+          </div>
+        `;
+      case 'dropdown':
+      case 'select':
+        return `
+          <select class="form-select" disabled>
+            <option>Choose...</option>
+            ${question.options ? question.options.map(option => `
+              <option>${typeof option === 'object' ? (option.label || option.text || option.value) : option}</option>
+            `).join('') : ''}
+          </select>
+        `;
+      case 'short-answer':
+        return '<input type="text" class="form-control" placeholder="Short answer text" disabled>';
+      case 'paragraph':
+        return '<textarea class="form-control" rows="3" placeholder="Long answer text" disabled></textarea>';
+      case 'linear-scale':
+        return `
+          <div class="scale-preview">
+            <span>1</span>
+            ${Array.from({length: 5}, (_, i) => `<input type="radio" disabled>`).join('')}
+            <span>5</span>
+          </div>
+        `;
+      case 'date':
+        return '<input type="date" class="form-control" disabled>';
+      case 'time':
+        return '<input type="time" class="form-control" disabled>';
+      default:
+        return '<p class="text-muted">Unknown question type</p>';
+    }
   }
 
   async saveForm() {
     try {
-      // Ensure we have an app to save the form to
-      const appId = await this.ensureAppExists();
+      // Get selected form type
+      const formTypeSelect = document.getElementById('formType');
+      if (!formTypeSelect || !formTypeSelect.value) {
+        this.showErrorMessage('Please select a form type before saving the form.');
+        return;
+      }
+      
+      // Disable save button to prevent multiple saves
+      const saveBtn = document.getElementById('saveForm');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+      }
       
       const formData = this.getFormData();
-      formData.appId = appId;
+      formData.formTypeId = formTypeSelect.value;
       
-      const url = this.currentForm.id ? `/api/forms/${this.currentForm.id}` : '/api/forms';
-      const response = await fetch(url, {
-        method: this.currentForm.id ? 'PUT' : 'POST',
+      // Save to a new endpoint for form type based forms
+      const response = await fetch('/api/form-types/save-form', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -490,57 +962,58 @@ class GoogleFormsBuilder {
 
       if (response.ok) {
         const result = await response.json();
-        this.currentForm.id = result.id;
+        console.log('Save API response:', result);
+        
+        // Update current form with the saved form ID
+        if (result.form && result.form._id) {
+          this.currentForm.id = result.form._id;
+          console.log('Form ID set to:', this.currentForm.id);
+        } else if (result.data && result.data.id) {
+          // Handle case where form ID is in data.id
+          this.currentForm.id = result.data.id;
+          console.log('Form ID set to (data.id):', this.currentForm.id);
+        } else if (result._id) {
+          // Handle case where form ID is directly in result
+          this.currentForm.id = result._id;
+          console.log('Form ID set to (direct):', this.currentForm.id);
+        } else {
+          console.log('No form ID found in response:', result);
+        }
         this.showSuccessMessage('Form saved successfully!');
+        
+        // Disable save button after successful save and enable publish button
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
+        }
+        
+        // Enable publish button after successful save
+        const publishBtn = document.getElementById('publishForm');
+        if (publishBtn) {
+          publishBtn.disabled = false;
+        }
+        
+        // Don't clear the form after successful save to allow publishing
+        // this.clearForm();
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to save form');
       }
     } catch (error) {
       console.error('Error saving form:', error);
+      
+      // Re-enable save button on error
+      const saveBtn = document.getElementById('saveForm');
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+      }
+      
       this.showErrorMessage(`Failed to save form: ${error.message}`);
     }
   }
 
-  async ensureAppExists() {
-    try {
-      // First, try to get existing apps
-      const appsResponse = await fetch('/api/apps');
-      
-      if (appsResponse.ok) {
-        const appsData = await appsResponse.json();
-        if (appsData.apps && appsData.apps.length > 0) {
-          return appsData.apps[0]._id; // Use the first available app
-        }
-      }
-      
-      // If no apps exist, create a default one
-      const createAppResponse = await fetch('/api/apps', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: 'default',
-          displayName: 'Default App',
-          description: 'Default application for form builder',
-          code: 'DEFAULT',
-          icon: '📝',
-          color: '#007bff'
-        })
-      });
-      
-      if (createAppResponse.ok) {
-        const newApp = await createAppResponse.json();
-        return newApp._id;
-      } else {
-        throw new Error('Failed to create default app');
-      }
-    } catch (error) {
-      console.error('Error ensuring app exists:', error);
-      throw new Error('Unable to create or access application');
-    }
-  }
+  // App management removed - authentication no longer required
 
   previewForm() {
     const formData = this.getFormData();
@@ -549,18 +1022,119 @@ class GoogleFormsBuilder {
   }
 
   publishForm() {
+    console.log('Publish button clicked');
+    console.log('Current form ID:', this.currentForm.id);
+    
+    // Only allow publish if form is already saved
     if (this.currentForm.id) {
-      const publishUrl = `/form-viewer.html?id=${this.currentForm.id}`;
-      navigator.clipboard.writeText(window.location.origin + publishUrl);
-      this.showSuccessMessage('Form URL copied to clipboard!');
+      console.log('Showing embed dialog for form ID:', this.currentForm.id);
+      this.showEmbedCodeDialog(this.currentForm.id);
     } else {
-      this.showErrorMessage('Please save the form first.');
+      console.log('No form ID found, showing error message');
+      this.showErrorMessage('Please save the form first before publishing.');
     }
+  }
+
+
+
+  showEmbedCodeDialog(formId) {
+    console.log('showEmbedCodeDialog called with formId:', formId);
+    const baseUrl = window.location.origin;
+    const embedCode = `<script type="text/javascript" src="${baseUrl}/popup/embed.js" data-form-id="${formId}"></script>`;
+    console.log('Generated embed code:', embedCode);
+    
+    // Create modal dialog
+    const modal = document.createElement('div');
+    console.log('Modal element created');
+    modal.className = 'modal fade show';
+    modal.style.display = 'block';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    
+    modal.innerHTML = `
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">📋 Embed Code</h5>
+            <button type="button" class="btn-close" onclick="this.closest('.modal').remove()"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted mb-3">Copy and paste this code into your website to embed the survey widget:</p>
+            <div class="form-group">
+              <label class="form-label fw-bold">Embed Script:</label>
+              <div class="input-group">
+                <textarea class="form-control" id="embedCodeText" rows="3" readonly>${embedCode}</textarea>
+                <button class="btn btn-primary" type="button" onclick="this.copyEmbedCode()">
+                  <i class="fas fa-copy"></i> Copy
+                </button>
+              </div>
+            </div>
+            <div class="alert alert-info mt-3">
+              <i class="fas fa-info-circle"></i>
+              <strong>How to use:</strong>
+              <ul class="mb-0 mt-2">
+                <li>Paste this script tag anywhere in your HTML page</li>
+                <li>The widget will automatically appear as a popup</li>
+                <li>Users can interact with your form directly on their website</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+            <button type="button" class="btn btn-primary" onclick="this.copyEmbedCode()">
+              <i class="fas fa-copy"></i> Copy Embed Code
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add copy functionality
+    modal.copyEmbedCode = function() {
+      const textarea = modal.querySelector('#embedCodeText');
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(embedCode).then(() => {
+        // Show success feedback
+        const copyBtn = modal.querySelector('.modal-footer .btn-primary');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        copyBtn.classList.remove('btn-primary');
+        copyBtn.classList.add('btn-success');
+        
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+          copyBtn.classList.remove('btn-success');
+          copyBtn.classList.add('btn-primary');
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+        alert('Failed to copy to clipboard. Please copy manually.');
+      });
+    };
+    
+    // Ensure modal is properly styled and visible
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.zIndex = '9999';
+    
+    document.body.appendChild(modal);
+    
+    // Auto-focus and select the textarea
+    setTimeout(() => {
+      const textarea = modal.querySelector('#embedCodeText');
+      if (textarea) {
+        textarea.focus();
+        textarea.select();
+      }
+    }, 100);
   }
 
   openFormSettings() {
         // Switch to settings tab instead of opening modal
-        this.showTab('settings');
+        this.switchTab('settings');
     }
 
   getFormData() {
@@ -631,6 +1205,7 @@ class GoogleFormsBuilder {
       description: document.getElementById('formDescription').value || '',
       formType: document.getElementById('formType')?.value || null,
       questions: questions,
+      assignedUsers: this.assignedUsers || [],
       settings: {
         allowAnonymous: true,
         requireLogin: false,
@@ -660,7 +1235,7 @@ class GoogleFormsBuilder {
     try {
       const response = await fetch(`/api/forms/${formId}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
       });
 
@@ -685,6 +1260,13 @@ class GoogleFormsBuilder {
       formTypeSelect.value = this.currentForm.formType;
     }
     
+    // Load assigned users if they exist
+    if (this.currentForm.assignedUsers) {
+      this.assignedUsers = this.currentForm.assignedUsers;
+    } else {
+      this.assignedUsers = [];
+    }
+    
     // Clear existing questions and render new ones
     const questionsContainer = document.getElementById('formQuestions');
     questionsContainer.innerHTML = '';
@@ -697,6 +1279,9 @@ class GoogleFormsBuilder {
       // Add default question if none exist
       this.addQuestion();
     }
+    
+    // Render assigned users in settings tab
+    this.renderAssignedUsers();
   }
 
   renderQuestion(questionData) {
@@ -813,13 +1398,25 @@ class GoogleFormsBuilder {
     console.error('Error:', message);
   }
 
+  showInfoMessage(message) {
+    // Show info toast or notification
+    console.log('Info:', message);
+  }
+
   // Form Type Management Methods
   async loadFormTypes() {
     try {
-      const response = await fetch('/api/form-types');
+      const response = await fetch('/api/form-types', {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
       if (response.ok) {
         const formTypes = await response.json();
         this.populateFormTypeDropdown(formTypes);
+      } else {
+        console.error('Failed to load form types:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error loading form types:', error);
@@ -828,6 +1425,8 @@ class GoogleFormsBuilder {
 
   populateFormTypeDropdown(formTypes) {
     const formTypeSelect = document.getElementById('formType');
+    const responseFormTypeSelect = document.getElementById('responseFormTypeSelect');
+    
     if (formTypeSelect) {
       // Clear existing options except the first one
       formTypeSelect.innerHTML = '<option value="">Select form type...</option>';
@@ -835,8 +1434,20 @@ class GoogleFormsBuilder {
       formTypes.forEach(type => {
         const option = document.createElement('option');
         option.value = type._id;
-        option.textContent = type.name;
+        option.textContent = type.name || type.title;
         formTypeSelect.appendChild(option);
+      });
+    }
+    
+    if (responseFormTypeSelect) {
+      // Clear existing options except the first one
+      responseFormTypeSelect.innerHTML = '<option value="">Select a form type...</option>';
+      
+      formTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type._id;
+        option.textContent = type.name || type.title;
+        responseFormTypeSelect.appendChild(option);
       });
     }
   }
@@ -887,10 +1498,236 @@ class GoogleFormsBuilder {
       this.showErrorMessage('Error creating form type');
     }
   }
+
+  // User Assignment Methods
+  async addUserToProject() {
+    const userEmailInput = document.getElementById('userEmailInput');
+    const email = userEmailInput.value.trim();
+    
+    if (!email) {
+      this.showErrorMessage('Please enter a user email');
+      return;
+    }
+    
+    if (!this.isValidEmail(email)) {
+      this.showErrorMessage('Please enter a valid email address');
+      return;
+    }
+    
+    try {
+      // Check if user exists
+      const userResponse = await fetch(`/api/users/check-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+      
+      if (!userResponse.ok) {
+        this.showErrorMessage('User not found. Please ensure the user is registered in the system.');
+        return;
+      }
+      
+      const userData = await userResponse.json();
+      
+      // Check if user is already assigned
+      if (this.isUserAlreadyAssigned(email)) {
+        this.showErrorMessage('User is already assigned to this project');
+        return;
+      }
+      
+      // Add user to the current form's assigned users
+      if (!this.currentForm.assignedUsers) {
+        this.currentForm.assignedUsers = [];
+      }
+      
+      this.currentForm.assignedUsers.push({
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        role: userData.role,
+        assignedAt: new Date().toISOString()
+      });
+      
+      // Update the UI
+      this.renderAssignedUsers();
+      userEmailInput.value = '';
+      
+      this.showSuccessMessage(`User ${email} added successfully`);
+      
+    } catch (error) {
+      console.error('Error adding user:', error);
+      this.showErrorMessage('Failed to add user. Please try again.');
+    }
+  }
+  
+  removeUserFromProject(email) {
+    if (!this.currentForm.assignedUsers) return;
+    
+    this.currentForm.assignedUsers = this.currentForm.assignedUsers.filter(user => user.email !== email);
+    this.renderAssignedUsers();
+    this.showSuccessMessage(`User ${email} removed successfully`);
+  }
+  
+  isUserAlreadyAssigned(email) {
+    if (!this.currentForm.assignedUsers) return false;
+    return this.currentForm.assignedUsers.some(user => user.email === email);
+  }
+  
+  isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+  
+  renderAssignedUsers() {
+    const assignedUsersList = document.getElementById('assignedUsersList');
+    if (!assignedUsersList) return;
+    
+    if (!this.currentForm.assignedUsers || this.currentForm.assignedUsers.length === 0) {
+      assignedUsersList.innerHTML = `
+        <div class="empty-users-message">
+          <i class="fas fa-users"></i>
+          <p>No users assigned yet. Add users to give them access to this project.</p>
+        </div>
+      `;
+      return;
+    }
+    
+    assignedUsersList.innerHTML = this.currentForm.assignedUsers.map(user => {
+      const initials = (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase();
+      return `
+        <div class="assigned-user-item">
+          <div class="user-info">
+            <div class="user-avatar">${initials}</div>
+            <div>
+              <div class="user-email">${user.email}</div>
+              <span class="user-role">${user.role}</span>
+            </div>
+          </div>
+          <button type="button" class="remove-user-btn" data-user-email="${user.email}" title="Remove user">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+    
+    // Add event listeners for remove buttons
+    assignedUsersList.querySelectorAll('.remove-user-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const userEmail = e.target.closest('.remove-user-btn').dataset.userEmail;
+        this.removeUserFromProject(userEmail);
+      });
+    });
+  }
+  
+  async saveFormWithUsers() {
+    try {
+      const formData = this.getFormData();
+      
+      // Include assigned users in the form data
+      if (this.currentForm.assignedUsers) {
+        formData.assignedUsers = this.currentForm.assignedUsers;
+      }
+      
+      const response = await fetch('/api/forms', {
+        method: this.currentForm.id ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      if (response.ok) {
+        const savedForm = await response.json();
+        this.currentForm.id = savedForm._id;
+        this.showSuccessMessage('Form and user assignments saved successfully!');
+        return savedForm;
+      } else {
+        throw new Error('Failed to save form');
+      }
+    } catch (error) {
+      console.error('Error saving form with users:', error);
+      this.showErrorMessage('Failed to save form and user assignments');
+      throw error;
+    }
+  }
+
+  async saveProject() {
+    try {
+      const projectTitle = document.getElementById('projectTitle')?.value?.trim();
+      const projectDescription = document.getElementById('projectDescription')?.value?.trim();
+      const projectCategory = document.getElementById('projectCategory')?.value?.trim();
+
+      // Validation
+      if (!projectTitle) {
+        this.showErrorMessage('Project title is required');
+        return;
+      }
+
+      // No authentication required for direct save
+      console.log('Saving project data directly to MongoDB...');
+
+      const projectData = {
+        title: projectTitle,
+        description: projectDescription || '',
+        category: projectCategory || 'general'
+      };
+
+      const response = await fetch('/api/form-types/direct-save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(projectData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        this.showSuccessMessage('Data saved successfully to survey.formtypes collection!');
+        
+        // Clear form fields
+        document.getElementById('projectTitle').value = '';
+        document.getElementById('projectDescription').value = '';
+        document.getElementById('projectCategory').value = '';
+        
+        console.log('Data saved to MongoDB:', result);
+      } else {
+        console.error('Save project failed:', response.status, response.statusText);
+        
+        if (response.status === 401) {
+          this.showErrorMessage('Authentication failed. Please log in again.');
+          // Optionally redirect to login
+          // window.location.href = '/login.html';
+        } else {
+          try {
+            const error = await response.json();
+            this.showErrorMessage(error.message || `Failed to save project (${response.status})`);
+          } catch (e) {
+            this.showErrorMessage(`Failed to save project (${response.status}: ${response.statusText})`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error saving project:', error);
+      this.showErrorMessage('Error saving project');
+    }
+  }
 }
 
 // Initialize the form builder when the page loads
+let formBuilder;
 document.addEventListener('DOMContentLoaded', () => {
-  const formBuilder = new GoogleFormsBuilder();
+  formBuilder = new GoogleFormsBuilder();
   formBuilder.init();
+  
+  // Initialize user assignment UI when settings tab is shown
+  const settingsTab = document.querySelector('[data-tab="settings"]');
+  if (settingsTab) {
+    settingsTab.addEventListener('click', () => {
+      setTimeout(() => {
+        formBuilder.renderAssignedUsers();
+      }, 100);
+    });
+  }
 });

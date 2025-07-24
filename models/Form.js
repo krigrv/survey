@@ -85,25 +85,13 @@ const formSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  appId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'App',
-    required: true
-  },
-  appName: {
-    type: String,
-    required: true
-  },
+  // App references removed - no longer using app-based organization
   formType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'FormType',
     default: null
   },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
+  // User references removed - forms are now public
   status: {
     type: String,
     enum: ['draft', 'published', 'closed', 'archived'],
@@ -119,10 +107,7 @@ const formSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     },
-    requireLogin: {
-      type: Boolean,
-      default: false
-    },
+    // Login requirement removed - forms are now public
     showProgressBar: {
       type: Boolean,
       default: true
@@ -187,6 +172,7 @@ const formSchema = new mongoose.Schema({
     notificationEmails: [String],
     webhookUrl: String
   },
+  // User assignment removed - forms are now public
   lastModified: {
     type: Date,
     default: Date.now
@@ -205,7 +191,6 @@ const formSchema = new mongoose.Schema({
 });
 
 // Indexes for better performance
-formSchema.index({ appId: 1, createdBy: 1 });
 formSchema.index({ status: 1 });
 formSchema.index({ 'sharing.shareableLink': 1 });
 formSchema.index({ title: 'text', description: 'text' });
@@ -233,16 +218,7 @@ formSchema.methods.generateEmbedCode = function() {
 };
 
 // Check if user can access this form
-formSchema.methods.canUserAccess = function(user, requiredPermission = 'view') {
-  // Super admin can access everything
-  if (user.role === 'super_admin') return true;
-  
-  // Admin can access everything
-  if (user.role === 'admin') return true;
-  
-  // Check app-specific permissions
-  return user.hasAppPermission(this.appId, requiredPermission);
-};
+// User access control removed - forms are now public
 
 // Get form statistics
 formSchema.methods.getStatistics = function() {

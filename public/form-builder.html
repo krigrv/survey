@@ -83,6 +83,12 @@
                 <div class="form-header-card">
                     <div class="form-header-content">
                         <input type="text" class="form-title-input" placeholder="Untitled form" id="formTitle" value="Untitled form">
+                        <div class="form-type-selector" style="margin: 10px 0;">
+                            <label for="formType" style="display: block; margin-bottom: 5px; font-weight: 500; color: #5f6368;">Form Type *</label>
+                            <select class="form-type-dropdown" id="formType" style="width: 100%; max-width: 300px;">
+                                <option value="">Select form type...</option>
+                            </select>
+                        </div>
                         <textarea class="form-description-input" placeholder="Form description" id="formDescription"></textarea>
                     </div>
                 </div>
@@ -158,10 +164,18 @@
             <!-- Responses Tab Content -->
             <div class="tab-content" id="responsesTab" style="display: none;">
                 <div class="responses-container">
-                    <div class="empty-state">
-                        <i class="fas fa-chart-bar"></i>
-                        <h5>No responses yet</h5>
-                        <p>When people submit your form, you'll see their responses here.</p>
+                    <div class="mb-3">
+                        <label for="responseFormTypeSelect" class="form-label">Select Form Type to View:</label>
+                        <select class="form-select" id="responseFormTypeSelect">
+                            <option value="">Select a form type...</option>
+                        </select>
+                    </div>
+                    <div id="responseFormsContainer">
+                        <div class="empty-state">
+                            <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No forms found</h5>
+                            <p class="text-muted">Select a form type above to view saved forms.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -175,88 +189,30 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>General Settings</h6>
-                                
-                                <div class="form-item">
-                                    <label for="formType" class="label">Form Type</label>
-                                    <div class="form-type-container">
-                                        <select class="select" id="formType" name="formType">
-                                            <option value="">Select form type...</option>
-                                        </select>
-                                        <button type="button" class="btn btn-outline-primary btn-sm" id="addFormTypeBtn">
-                                            <i class="fas fa-plus"></i> Add New
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-item" id="newFormTypeContainer" style="display: none;">
-                                    <label for="newFormTypeName" class="label">New Form Type Name</label>
-                                    <div class="input-group">
-                                        <input type="text" class="input" id="newFormTypeName" placeholder="Enter form type name">
-                                        <button type="button" class="btn btn-success btn-sm" id="saveFormTypeBtn">
-                                            <i class="fas fa-save"></i> Save
-                                        </button>
-                                        <button type="button" class="btn btn-secondary btn-sm" id="cancelFormTypeBtn">
-                                            <i class="fas fa-times"></i> Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-item">
-                                    <label for="formApp" class="label">Application</label>
-                                    <select class="select" id="formApp" name="appId">
-                                        <option value="">Select application...</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-item">
-                                    <label for="formStatus" class="label">Status</label>
-                                    <select class="select" id="formStatus" name="status">
-                                        <option value="draft">Draft</option>
-                                        <option value="published">Published</option>
-                                        <option value="archived">Archived</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-item">
-                                    <div class="flex items-center space-x-2">
-                                        <input class="checkbox" type="checkbox" id="allowMultipleSubmissions">
-                                        <label class="label" for="allowMultipleSubmissions">
-                                            Allow multiple submissions
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-item">
-                                    <div class="flex items-center space-x-2">
-                                        <input class="checkbox" type="checkbox" id="requireLogin">
-                                        <label class="label" for="requireLogin">
-                                            Require login to submit
-                                        </label>
-                                    </div>
-                                </div>
+                                <p class="text-muted">Form type is now selected in the main form header above.</p>
                             </div>
                             
                             <div class="col-md-6">
-                                <h6>Submission Settings</h6>
+                                <h6>Project Management</h6>
                                 
                                 <div class="form-item">
-                                    <label for="submitButtonText" class="label">Submit Button Text</label>
-                                    <input type="text" class="input" id="submitButtonText" value="Submit">
+                                    <label for="projectTitle" class="label">Project Title</label>
+                                    <input type="text" class="input" id="projectTitle" placeholder="Enter project title" maxlength="200">
                                 </div>
                                 
                                 <div class="form-item">
-                                    <label for="successMessage" class="label">Success Message</label>
-                                    <textarea class="textarea" id="successMessage" rows="3" placeholder="Thank you for your submission!"></textarea>
+                                    <label for="projectDescription" class="label">Project Description</label>
+                                    <textarea class="textarea" id="projectDescription" placeholder="Enter project description" rows="3" maxlength="1000"></textarea>
                                 </div>
                                 
                                 <div class="form-item">
-                                    <label for="redirectUrl" class="label">Redirect URL (optional)</label>
-                                    <input type="url" class="input" id="redirectUrl" placeholder="https://example.com/thank-you">
+                                    <label for="projectCategory" class="label">Category</label>
+                                    <input type="text" class="input" id="projectCategory" placeholder="Enter category" maxlength="50">
                                 </div>
                                 
                                 <div class="form-item">
-                                    <button type="button" class="btn btn-primary" id="saveFormSettingsBtn">
-                                        <i class="fas fa-save"></i> Save Settings
+                                    <button type="button" class="btn btn-primary" id="saveProjectBtn">
+                                        <i class="fas fa-save"></i> Save Project
                                     </button>
                                 </div>
                             </div>
@@ -302,7 +258,7 @@
     <!-- Custom JS -->
     <script src="/js/utils.js"></script>
     <script src="/js/api.js"></script>
-    <script src="/js/auth.js"></script>
+    <!-- Authentication script removed -->
     <script src="/js/form-builder.js"></script>
     <script src="/js/main.js"></script>
 </body>

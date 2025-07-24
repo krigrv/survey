@@ -2,14 +2,7 @@ const express = require('express');
 const { body, validationResult, query } = require('express-validator');
 const Form = require('../models/Form');
 const Response = require('../models/Response');
-const App = require('../models/App');
-const { 
-  auth, 
-  requireAppPermission, 
-  requireEditPermission,
-  validateFormAccess,
-  optionalAuth 
-} = require('../middleware/auth');
+// Authentication middleware removed
 
 const router = express.Router();
 
@@ -20,8 +13,6 @@ router.get('/', [
   [
     query('page').optional().isInt({ min: 1 }),
     query('limit').optional().isInt({ min: 1, max: 100 }),
-    query('appId').optional().isMongoId(),
-    query('appCode').optional().trim(),
     query('status').optional().isIn(['draft', 'published', 'closed', 'archived']),
     query('search').optional().trim(),
     query('category').optional().trim(),
@@ -38,25 +29,12 @@ router.get('/', [
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const { appId, appCode, status, search, category, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+    const { status, search, category, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
 
     // Build query
     let query = {};
 
-    // Filter by appId if provided
-    if (appId) {
-      query.appId = appId;
-    }
-
-    // Filter by app code if provided
-    if (appCode) {
-      const app = await App.findOne({ code: appCode });
-      if (app) {
-        query.appId = app._id;
-      } else {
-        return res.status(404).json({ message: 'App not found with the specified code' });
-      }
-    }
+    // App filtering removed - forms are now independent
 
     if (status) {
       query.status = status;
@@ -79,8 +57,6 @@ router.get('/', [
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
     const forms = await Form.find(query)
-      .populate('appId', 'name displayName')
-      .populate('createdBy', 'firstName lastName email')
       .sort(sort)
       .skip(skip)
       .limit(limit)
@@ -120,14 +96,9 @@ router.get('/', [
 // @route   GET /api/forms/:id
 // @desc    Get form by ID
 // @access  Private
-router.get('/:id', [
-  auth,
-  validateFormAccess
-], async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const form = await Form.findById(req.params.id)
-      .populate('appId', 'name displayName')
-      .populate('createdBy', 'firstName lastName email');
+    const form = await Form.findById(req.params.id);
 
     if (!form) {
       return res.status(404).json({ message: 'Form not found' });
@@ -139,8 +110,8 @@ router.get('/:id', [
     const formWithStats = {
       ...form.toJSON(),
       statistics: stats,
-      canEdit: form.canUserAccess(req.user, 'edit'),
-      canDelete: form.canUserAccess(req.user, 'admin') || form.createdBy._id.toString() === req.user._id.toString()
+      canEdit: true, // Forms are now public and editable
+      canDelete: true // Forms are now public and deletable
     };
 
     res.json(formWithStats);
@@ -157,7 +128,6 @@ router.post('/', [
   [
     body('title').trim().notEmpty().isLength({ max: 200 }),
     body('description').optional().trim().isLength({ max: 1000 }),
-    body('appId').optional().isMongoId(),
     body('formType').optional().isMongoId(),
     body('questions').optional().isArray(),
     body('settings').optional().isObject(),
@@ -170,31 +140,9 @@ router.post('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    let { title, description, appId, formType, questions = [], settings = {}, category, tags = [] } = req.body;
+    let { title, description, formType, questions = [], settings = {}, category, tags = [] } = req.body;
 
-    // If no appId provided, create or find a default app
-    let app;
-    if (appId) {
-      app = await App.findById(appId);
-      if (!app) {
-        return res.status(404).json({ message: 'App not found' });
-      }
-    } else {
-      // Try to find existing default app or create one
-      app = await App.findOne({ name: 'default-app' });
-      if (!app) {
-        app = new App({
-          name: 'default-app',
-          displayName: 'Default App',
-          description: 'Default application for forms',
-          code: 'DEFAULT',
-          color: '#3B82F6',
-          isActive: true
-        });
-        await app.save();
-      }
-      appId = app._id;
-    }
+    // App management removed - forms are now independent
 
     // Process questions to ensure proper structure
     const processedQuestions = questions.map((question, index) => ({
@@ -214,15 +162,12 @@ router.post('/', [
     const form = new Form({
       title,
       description,
-      appId,
-      appName: app.name,
       formType: formType || null,
-      createdBy: req.user ? req.user._id : null,
       questions: processedQuestions,
       settings: {
         ...settings,
         customTheme: settings.customTheme || {
-          primaryColor: app.color,
+          primaryColor: '#3B82F6',
           backgroundColor: '#ffffff',
           fontFamily: 'Inter, sans-serif'
         }
@@ -239,18 +184,13 @@ router.post('/', [
 
     await form.save();
 
-    // Update app form count
-    await App.findByIdAndUpdate(appId, {
-      $inc: { totalForms: 1 }
-    });
+    // App management removed - no need to update app counts
 
-    const populatedForm = await Form.findById(form._id)
-      .populate('appId', 'name displayName')
-      .populate('createdBy', 'firstName lastName email');
+    const savedForm = await Form.findById(form._id);
 
     res.status(201).json({
       message: 'Form created successfully',
-      form: populatedForm
+      form: savedForm
     });
   } catch (error) {
     console.error('Create form error:', error);
@@ -262,8 +202,6 @@ router.post('/', [
 // @desc    Update form
 // @access  Private (Edit permission required)
 router.put('/:id', [
-  auth,
-  validateFormAccess,
   [
     body('title').optional().trim().notEmpty().isLength({ max: 200 }),
     body('description').optional().trim().isLength({ max: 1000 }),
@@ -272,7 +210,8 @@ router.put('/:id', [
     body('settings').optional().isObject(),
     body('status').optional().isIn(['draft', 'published', 'closed', 'archived']),
     body('category').optional().trim().isLength({ max: 50 }),
-    body('tags').optional().isArray()
+    body('tags').optional().isArray(),
+    // User assignment removed
   ]
 ], async (req, res) => {
   try {
@@ -281,11 +220,10 @@ router.put('/:id', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const form = req.form; // From validateFormAccess middleware
+    const form = await Form.findById(req.params.id);
     
-    // Check edit permission
-    if (!form.canUserAccess(req.user, 'edit')) {
-      return res.status(403).json({ message: 'No permission to edit this form' });
+    if (!form) {
+      return res.status(404).json({ message: 'Form not found' });
     }
 
     const { title, description, formType, questions, settings, status, category, tags } = req.body;
@@ -314,6 +252,7 @@ router.put('/:id', [
     if (status) form.status = status;
     if (category) form.category = category;
     if (tags) form.tags = tags;
+    // User assignment removed
 
     // Generate shareable link if publishing for the first time
     if (status === 'published' && !form.sharing.shareableLink) {
@@ -326,9 +265,7 @@ router.put('/:id', [
 
     await form.save();
 
-    const updatedForm = await Form.findById(form._id)
-      .populate('appId', 'name displayName')
-      .populate('createdBy', 'firstName lastName email');
+    const updatedForm = await Form.findById(form._id);
 
     res.json({
       message: 'Form updated successfully',
@@ -343,28 +280,18 @@ router.put('/:id', [
 // @route   DELETE /api/forms/:id
 // @desc    Delete form
 // @access  Private (Admin permission or form owner)
-router.delete('/:id', [
-  auth,
-  validateFormAccess
-], async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    const form = req.form;
+    const form = await Form.findById(req.params.id);
     
-    // Check delete permission (admin or form creator)
-    const canDelete = form.canUserAccess(req.user, 'admin') || 
-                     form.createdBy.toString() === req.user._id.toString();
-    
-    if (!canDelete) {
-      return res.status(403).json({ message: 'No permission to delete this form' });
+    if (!form) {
+      return res.status(404).json({ message: 'Form not found' });
     }
 
     // Delete all responses associated with this form
     await Response.deleteMany({ formId: form._id });
 
-    // Update app form count
-    await App.findByIdAndUpdate(form.appId, {
-      $inc: { totalForms: -1 }
-    });
+    // App management removed
 
     // Delete form
     await Form.findByIdAndDelete(form._id);
@@ -379,17 +306,12 @@ router.delete('/:id', [
 // @route   POST /api/forms/:id/duplicate
 // @desc    Duplicate form
 // @access  Private (Edit permission required)
-router.post('/:id/duplicate', [
-  auth,
-  validateFormAccess,
-  requireEditPermission
-], async (req, res) => {
+router.post('/:id/duplicate', async (req, res) => {
   try {
-    const originalForm = req.form;
+    const originalForm = await Form.findById(req.params.id);
     
-    // Check if user can create forms in this app
-    if (!originalForm.canUserAccess(req.user, 'edit')) {
-      return res.status(403).json({ message: 'No permission to duplicate this form' });
+    if (!originalForm) {
+      return res.status(404).json({ message: 'Form not found' });
     }
 
     // Create duplicate
@@ -402,24 +324,19 @@ router.post('/:id/duplicate', [
     
     duplicateData.title = `${duplicateData.title} (Copy)`;
     duplicateData.status = 'draft';
-    duplicateData.createdBy = req.user._id;
+    // User authentication removed
     duplicateData.version = 1;
 
     const duplicateForm = new Form(duplicateData);
     await duplicateForm.save();
 
-    // Update app form count
-    await App.findByIdAndUpdate(originalForm.appId, {
-      $inc: { totalForms: 1 }
-    });
+    // App management removed
 
-    const populatedForm = await Form.findById(duplicateForm._id)
-      .populate('appId', 'name displayName')
-      .populate('createdBy', 'firstName lastName email');
+    const savedForm = await Form.findById(duplicateForm._id);
 
     res.status(201).json({
       message: 'Form duplicated successfully',
-      form: populatedForm
+      form: savedForm
     });
   } catch (error) {
     console.error('Duplicate form error:', error);
@@ -431,8 +348,6 @@ router.post('/:id/duplicate', [
 // @desc    Get form responses
 // @access  Private
 router.get('/:id/responses', [
-  auth,
-  validateFormAccess,
   [
     query('page').optional().isInt({ min: 1 }),
     query('limit').optional().isInt({ min: 1, max: 100 }),
@@ -474,7 +389,7 @@ router.get('/:id/responses', [
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
     const responses = await Response.find(query)
-      .populate('respondentId', 'firstName lastName email')
+      // User populate removed
       .sort(sort)
       .skip(skip)
       .limit(limit);
@@ -499,12 +414,13 @@ router.get('/:id/responses', [
 // @route   GET /api/forms/:id/analytics
 // @desc    Get form analytics
 // @access  Private
-router.get('/:id/analytics', [
-  auth,
-  validateFormAccess
-], async (req, res) => {
+router.get('/:id/analytics', async (req, res) => {
   try {
-    const form = req.form;
+    const form = await Form.findById(req.params.id);
+    
+    if (!form) {
+      return res.status(404).json({ message: 'Form not found' });
+    }
     
     // Get detailed analytics
     const analytics = await Response.getFormAnalytics(form._id);
@@ -562,21 +478,18 @@ router.get('/:id/analytics', [
 // @route   GET /api/forms/public/:shareableLink
 // @desc    Get public form by shareable link
 // @access  Public
-router.get('/public/:shareableLink', optionalAuth, async (req, res) => {
+router.get('/public/:shareableLink', async (req, res) => {
   try {
     const form = await Form.findOne({ 
       'sharing.shareableLink': req.params.shareableLink,
       status: 'published'
-    }).populate('appId', 'name displayName');
+    });
 
     if (!form) {
       return res.status(404).json({ message: 'Form not found or not published' });
     }
 
-    // Check if form requires login
-    if (form.settings.requireLogin && !req.user) {
-      return res.status(401).json({ message: 'Login required to access this form' });
-    }
+    // Login requirement removed - forms are now publicly accessible
 
     // Check if form has expired
     if (form.settings.expiryDate && new Date() > form.settings.expiryDate) {
@@ -602,7 +515,7 @@ router.get('/public/:shareableLink', optionalAuth, async (req, res) => {
         collectEmail: form.settings.collectEmail,
         customTheme: form.settings.customTheme
       },
-      appId: form.appId
+      // App reference removed
     };
 
     res.json(publicForm);

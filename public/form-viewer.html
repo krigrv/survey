@@ -57,12 +57,7 @@
                             </div>
                         </div>
                         
-                        <!-- Login Required Notice -->
-                        <div class="alert alert-info" id="loginRequiredAlert" style="display: none;">
-                            <i class="fas fa-info-circle"></i>
-                            This form requires you to be logged in to submit a response.
-                            <a href="/login.html" class="alert-link">Please log in</a> to continue.
-                        </div>
+                        <!-- Authentication removed - forms are now publicly accessible -->
                         
                         <!-- Form Unavailable Notice -->
                         <div class="alert alert-warning" id="formUnavailableAlert" style="display: none;">
@@ -282,12 +277,7 @@
                 const submitBtnText = form.settings?.submitButtonText || 'Submit';
                 document.getElementById('submitBtnText').textContent = submitBtnText;
                 
-                // Check if login is required
-                if (form.settings?.requireLogin && !this.isLoggedIn()) {
-                    document.getElementById('loginRequiredAlert').style.display = 'block';
-                    document.getElementById('formCard').style.display = 'none';
-                    return;
-                }
+                // Authentication removed - forms are now publicly accessible
                 
                 // Check form status
                 if (form.status !== 'published') {
@@ -1024,9 +1014,7 @@
                 }
             }
             
-            isLoggedIn() {
-                return !!localStorage.getItem('token');
-            }
+            // Authentication removed
             
             showError(message) {
                 document.getElementById('formCard').style.display = 'none';
