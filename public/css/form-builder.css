@@ -771,23 +771,271 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+
+/* Large tablets and small desktops */
+@media (max-width: 1024px) {
+  .google-forms-container {
+    padding: 0 16px;
+  }
+  
+  .form-tabs,
   .form-main-area {
-    padding: 16px;
+    max-width: 100%;
+    margin: 16px auto 0;
+  }
+  
+  .dhl-nav {
+    padding: 0 16px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .dhl-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .dhl-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: 60px;
+    padding: 12px 16px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .dhl-logo {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  
+  .form-builder-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+    flex: 1;
+    max-width: 60%;
+  }
+  
+  .form-builder-actions .dhl-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  
+  .google-forms-container {
+    padding: 0 12px;
+    min-height: calc(100vh - 120px);
+  }
+  
+  .form-tabs,
+  .form-main-area {
+    margin: 12px auto 0;
+    border-radius: 8px;
+  }
+  
+  .tab-container {
+    padding: 0 12px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .tab-button {
+    padding: 12px 16px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+  }
+  
+  .form-main-area {
+    padding: 20px 16px;
+  }
+  
+  .form-header-content {
+    padding: 20px;
+  }
+  
+  .form-title-input {
+    font-size: 24px;
   }
   
   .floating-toolbar {
     right: 16px;
+    bottom: 20px;
   }
   
   .question-header {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
   
   .question-type-selector {
     min-width: auto;
     width: 100%;
+  }
+  
+  .form-type-dropdown {
+    max-width: 100% !important;
+  }
+  
+  .question-card {
+    margin-bottom: 16px;
+  }
+  
+  .question-content {
+    padding: 16px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .dhl-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .dhl-nav {
+    padding: 8px 12px;
+    gap: 8px;
+    min-height: 56px;
+    flex-wrap: wrap;
+  }
+  
+  .dhl-logo {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  
+  .form-builder-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: flex-end;
+    flex: 1;
+  }
+  
+  .form-builder-actions .dhl-btn {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 12px;
+    min-width: 0;
+  }
+  
+  .google-forms-container {
+    padding: 0 8px;
+  }
+  
+  .form-tabs,
+  .form-main-area {
+    margin: 8px auto 0;
+    border-radius: 6px;
+  }
+  
+  .tab-container {
+    padding: 0 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .tab-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .tab-button {
+    padding: 10px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  
+  .form-main-area {
+    padding: 16px 12px;
+  }
+  
+  .form-header-content {
+    padding: 16px;
+  }
+  
+  .form-title-input {
+    font-size: 20px;
+  }
+  
+  .floating-toolbar {
+    right: 12px;
+    bottom: 16px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .floating-toolbar .dhl-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .question-content {
+    padding: 12px;
+  }
+  
+  .question-title {
+    font-size: 16px;
+  }
+  
+  .form-type-dropdown {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+  
+  .assigned-users-list {
+    max-height: 180px;
+    padding: 8px;
+  }
+  
+  .assigned-user-item {
+    padding: 8px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .user-info {
+    width: 100%;
+  }
+  
+  .user-role {
+    margin-left: 0;
+    margin-top: 4px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .form-builder-actions .dhl-btn {
+    font-size: 11px;
+    padding: 8px 6px;
+  }
+  
+  .tab-button {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+  
+  .form-title-input {
+    font-size: 18px;
+  }
+  
+  .question-title {
+    font-size: 14px;
   }
 }
 
