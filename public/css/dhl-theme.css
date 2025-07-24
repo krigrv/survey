@@ -104,7 +104,7 @@ p {
 
 /* Header/Navigation */
 .dhl-header {
-  background: var(--background-primary);
+  background: linear-gradient(to right, var(--dhl-yellow) 0%, rgba(255, 204, 0, 0.8) 50%, rgba(255, 255, 255, 0.9) 100%);
   border-bottom: 1px solid #E5E5E5;
   padding: var(--spacing-md) 0;
   position: sticky;
@@ -123,9 +123,9 @@ p {
 }
 
 .dhl-logo {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--dhl-gray-dark);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -142,7 +142,7 @@ p {
 }
 
 .dhl-nav-link {
-  color: var(--text-primary);
+  color: var(--dhl-gray-dark);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
@@ -179,7 +179,10 @@ p {
 .dhl-hero {
   background: linear-gradient(135deg, var(--dark-color) 0%, var(--accent-color) 100%);
   color: var(--dhl-white);
-  padding: var(--spacing-xxl) 0;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -199,7 +202,7 @@ p {
   position: relative;
   z-index: 2;
   max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
   padding: 0 var(--spacing-lg);
 }
 

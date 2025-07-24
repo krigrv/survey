@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey Builder - Modern Forms, Simply Delivered</title>
+    <title>Builder - Modern Forms, Simply Delivered</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     
     <!-- Bootstrap CSS -->
@@ -19,35 +19,19 @@
     <style>
         .dhl-hero {
             background: 
-                linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.9) 100%),
-                url('/images/shipping-port.svg') !important;
+                linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)),
+                url('/images/dhl-delivery-hero.svg') !important;
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
+            height: 500px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             color: white;
             position: relative;
             overflow: hidden;
-        }
-        
-        .dhl-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(
-                45deg,
-                rgba(0, 0, 0, 0.7) 0%,
-                rgba(0, 0, 0, 0.4) 30%,
-                rgba(0, 0, 0, 0.6) 70%,
-                rgba(0, 0, 0, 0.8) 100%
-            );
-            backdrop-filter: grayscale(30%) brightness(0.7);
-            z-index: 1;
+            filter: brightness(0.8) grayscale(10%);
         }
         
         .dhl-hero-content {
@@ -56,14 +40,15 @@
         }
         
         .dhl-hero-title {
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6) !important;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8) !important;
             color: white !important;
             font-weight: 700 !important;
         }
         
         .dhl-hero-subtitle {
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 0, 0, 0.5) !important;
-            color: rgba(255, 255, 255, 0.95) !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7) !important;
+            color: white !important;
+            font-weight: 500 !important;
         }
         
         .hero-title {
@@ -87,40 +72,37 @@
         }
         
         .dhl-btn {
-            text-shadow: none !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
             font-weight: 600 !important;
             border-radius: 8px !important;
-            padding: 0.875rem 2rem !important;
+            padding: 12px 24px !important;
             transition: all 0.3s ease !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
         }
         
         .dhl-btn-primary {
-            background: white !important;
-            color: #2d3748 !important;
-            border: 2px solid white !important;
+            background: #FFCC00 !important;
+            color: #2C2C2C !important;
+            border: 2px solid #FFCC00 !important;
         }
         
         .dhl-btn-primary:hover {
-            background: rgba(255, 255, 255, 0.9) !important;
-            color: #1a202c !important;
+            background: #E6B800 !important;
             transform: translateY(-2px) !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3) !important;
         }
         
         .dhl-btn-secondary {
-            background: rgba(0, 0, 0, 0.3) !important;
+            background: transparent !important;
             color: white !important;
-            border: 2px solid rgba(255, 255, 255, 0.8) !important;
-            backdrop-filter: blur(10px) !important;
+            border: 2px solid white !important;
         }
         
         .dhl-btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2) !important;
-            border-color: white !important;
-            color: white !important;
+            background: white !important;
+            color: #2C2C2C !important;
             transform: translateY(-2px) !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3) !important;
         }
         
         .features-section {
@@ -296,8 +278,8 @@
     <header class="dhl-header">
         <nav class="dhl-nav">
             <a href="/" class="dhl-logo">
-                <i class="fas fa-poll"></i>
-                Survey Builder
+                <img src="https://www.dhl.com/content/dam/dhl/global/core/images/logos/dhl-logo.svg" alt="DHL" style="height: 24px; margin-right: 6px;">
+                Builder
             </a>
             <ul class="dhl-nav-links">
                 <li><a href="/" class="dhl-nav-link active">Home</a></li>
@@ -314,7 +296,6 @@
             <p class="dhl-hero-subtitle">Build engaging surveys and forms with our intuitive platform. Collect and analyze data efficiently.</p>
             <div class="dhl-hero-buttons">
                 <a href="/dashboard.html" class="dhl-btn dhl-btn-primary"><i class="fas fa-rocket"></i> Get Started</a>
-                <a href="#features" class="dhl-btn dhl-btn-secondary"><i class="fas fa-book-open"></i> Learn More</a>
             </div>
         </div>
     </div>
@@ -371,7 +352,7 @@
     <footer class="dhl-footer">
         <div class="dhl-container dhl-footer-content">
             <div class="dhl-footer-section">
-                <h4>Survey Builder</h4>
+                <h4>Builder</h4>
                 <p>Empowering data collection</p>
             </div>
             <div class="dhl-footer-section">
@@ -401,7 +382,7 @@
             </div>
         </div>
         <div class="dhl-footer-bottom">
-            © 2024 Survey Builder. All rights reserved.
+            © 2024 Builder. All rights reserved.
         </div>
     </footer>
 
