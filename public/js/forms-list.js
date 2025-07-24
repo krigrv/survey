@@ -307,20 +307,23 @@ class FormsListManager {
 
     showSelectApplicationMessage() {
         document.getElementById('forms-container').innerHTML = `
-            <div class="text-center py-5">
-                <i class="fas fa-arrow-up fa-3x text-muted mb-3"></i>
-                <h4 class="text-muted">Select an Application</h4>
-                <p class="text-muted">Choose an application above to view its forms</p>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <h4>Select an Application</h4>
+                <p>Choose an application above to view its forms</p>
             </div>
         `;
     }
 
     showLoading() {
         document.getElementById('forms-container').innerHTML = `
-            <div class="text-center">
+            <div class="text-center py-5">
                 <div class="spinner-border" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
+                <p class="mt-3 text-muted">Loading forms...</p>
             </div>
         `;
     }
@@ -339,10 +342,12 @@ class FormsListManager {
         if (!forms || forms.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <div class="empty-state-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
                     <h4>No forms found</h4>
                     <p>No forms match your current filters. Try adjusting your search criteria or create a new form.</p>
-                    <a href="form-builder.html" class="btn btn-primary">
+                    <a href="form-builder.html" class="btn-action btn-primary-action">
                         <i class="fas fa-plus"></i> Create New Form
                     </a>
                 </div>
@@ -377,32 +382,30 @@ class FormsListManager {
         const statusClass = `status-${form.status || 'draft'}`;
         
         return `
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">${this.escapeHtml(form.title || 'Untitled Form')}</h5>
-                    <p class="card-text">${this.escapeHtml(form.description || 'No description')}</p>
-                    <div class="form-meta mb-3">
-                        <div>
-                            <span class="status-badge ${statusClass}">${form.status || 'draft'}</span>
-                            <span class="ms-2">
-                                <i class="fas fa-calendar"></i> ${createdDate}
-                            </span>
-                            <span class="ms-2">
-                                <i class="fas fa-question-circle"></i> ${form.questions?.length || 0} questions
-                            </span>
-                            <span class="ms-2">
-                                <i class="fas fa-chart-bar"></i> ${form.totalSubmissions || 0} responses
-                            </span>
-                        </div>
+            <div class="form-card">
+                <div class="form-title">${this.escapeHtml(form.title || 'Untitled Form')}</div>
+                <div class="form-description">${this.escapeHtml(form.description || 'No description')}</div>
+                <div class="form-meta">
+                    <div>
+                        <span class="status-badge ${statusClass}">${form.status || 'draft'}</span>
+                        <span class="ms-2">
+                            <i class="fas fa-calendar"></i> ${createdDate}
+                        </span>
+                        <span class="ms-2">
+                            <i class="fas fa-question-circle"></i> ${form.questions?.length || 0} questions
+                        </span>
+                        <span class="ms-2">
+                            <i class="fas fa-chart-bar"></i> ${form.totalSubmissions || 0} responses
+                        </span>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-primary btn-sm view-form-btn" data-form-id="${form._id}">
-                            <i class="fas fa-eye"></i> View Form
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm edit-form-btn" data-form-id="${form._id}">
-                            <i class="fas fa-edit"></i> Edit Form
-                        </button>
-                    </div>
+                </div>
+                <div class="form-actions">
+                    <a href="#" class="btn-action btn-primary-action view-form-btn" data-form-id="${form._id}">
+                        <i class="fas fa-eye"></i> View Form
+                    </a>
+                    <a href="form-builder.html?id=${form._id}" class="btn-action btn-secondary-action edit-form-btn" data-form-id="${form._id}">
+                        <i class="fas fa-edit"></i> Edit Form
+                    </a>
                 </div>
             </div>
         `;
@@ -527,7 +530,9 @@ class FormsListManager {
         if (!summary || summary.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                    <div class="empty-state-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
                     <h4>No responses found</h4>
                     <p>No form responses have been submitted yet.</p>
                 </div>

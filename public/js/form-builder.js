@@ -374,7 +374,8 @@ class GoogleFormsBuilder {
       embedButton.addEventListener('click', () => {
         const formId = embedButton.getAttribute('data-form-id');
         const baseUrl = window.location.origin;
-        const embedCode = `<script type="text/javascript" src="${baseUrl}/popup/embed.js" data-form-id="${formId}"></script>`;
+        const embedCode = `<script type="text/javascript" src="${baseUrl}/popup/embed
+          data-form-id="${formId}"></script>`;
         
         embedTextarea.value = embedCode;
         embedSection.style.display = embedSection.style.display === 'none' ? 'block' : 'none';
@@ -1040,7 +1041,8 @@ class GoogleFormsBuilder {
   showEmbedCodeDialog(formId) {
     console.log('showEmbedCodeDialog called with formId:', formId);
     const baseUrl = window.location.origin;
-    const embedCode = `<script type="text/javascript" src="${baseUrl}/popup/embed.js" data-form-id="${formId}"></script>`;
+    const embedCode = `<script type="text/javascript" src="${baseUrl}/popup/embed
+      data-form-id="${formId}"></script>`;
     console.log('Generated embed code:', embedCode);
     
     // Create modal dialog
@@ -1055,7 +1057,7 @@ class GoogleFormsBuilder {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">📋 Embed Code</h5>
-            <button type="button" class="btn-close" onclick="this.closest('.modal').remove()"></button>
+            <button type="button" class="btn-close close-btn"></button>
           </div>
           <div class="modal-body">
             <p class="text-muted mb-3">Copy and paste this code into your website to embed the survey widget:</p>
@@ -1063,7 +1065,7 @@ class GoogleFormsBuilder {
               <label class="form-label fw-bold">Embed Script:</label>
               <div class="input-group">
                 <textarea class="form-control" id="embedCodeText" rows="3" readonly>${embedCode}</textarea>
-                <button class="btn btn-primary" type="button" onclick="this.copyEmbedCode()">
+                <button class="btn btn-primary copy-btn" type="button">
                   <i class="fas fa-copy"></i> Copy
                 </button>
               </div>
@@ -1079,8 +1081,8 @@ class GoogleFormsBuilder {
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
-            <button type="button" class="btn btn-primary" onclick="this.copyEmbedCode()">
+            <button type="button" class="btn btn-secondary close-btn">Close</button>
+            <button type="button" class="btn btn-primary copy-btn">
               <i class="fas fa-copy"></i> Copy Embed Code
             </button>
           </div>
@@ -1089,28 +1091,43 @@ class GoogleFormsBuilder {
     `;
     
     // Add copy functionality
-    modal.copyEmbedCode = function() {
+    const copyEmbedCode = function() {
       const textarea = modal.querySelector('#embedCodeText');
       textarea.select();
       textarea.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(embedCode).then(() => {
         // Show success feedback
-        const copyBtn = modal.querySelector('.modal-footer .btn-primary');
-        const originalText = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        copyBtn.classList.remove('btn-primary');
-        copyBtn.classList.add('btn-success');
-        
-        setTimeout(() => {
-          copyBtn.innerHTML = originalText;
-          copyBtn.classList.remove('btn-success');
-          copyBtn.classList.add('btn-primary');
-        }, 2000);
+        const copyBtns = modal.querySelectorAll('.copy-btn');
+        copyBtns.forEach(copyBtn => {
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+          copyBtn.classList.remove('btn-primary');
+          copyBtn.classList.add('btn-success');
+          
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.classList.remove('btn-success');
+            copyBtn.classList.add('btn-primary');
+          }, 2000);
+        });
       }).catch(err => {
         console.error('Failed to copy: ', err);
         alert('Failed to copy to clipboard. Please copy manually.');
       });
     };
+    
+    // Attach event listeners
+    const copyButtons = modal.querySelectorAll('.copy-btn');
+    copyButtons.forEach(btn => {
+      btn.addEventListener('click', copyEmbedCode);
+    });
+    
+    const closeButtons = modal.querySelectorAll('.close-btn');
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modal.remove();
+      });
+    });
     
     // Ensure modal is properly styled and visible
     modal.style.position = 'fixed';
@@ -1576,7 +1593,7 @@ class GoogleFormsBuilder {
   }
   
   isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
     return emailRegex.test(email);
   }
   

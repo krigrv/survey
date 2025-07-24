@@ -13,66 +13,27 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/dhl-theme.css" rel="stylesheet">
     <link href="/css/forms.css" rel="stylesheet">
     <!-- Authentication CSS removed -->
 </head>
-<body>
-    <!-- Loading Spinner -->
-    <div id="loadingSpinner" class="loading-spinner">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard.html">
-                <i class="fas fa-poll-h"></i>
+<body>    <header class="dhl-header">
+        <nav class="dhl-nav">
+            <a href="/" class="dhl-logo">
+                <i class="fas fa-poll"></i>
                 Survey Builder
             </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/dashboard.html">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/apps.html">
-                            <i class="fas fa-th-large"></i> Applications
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/forms-list.html">
-                            <i class="fas fa-file-alt"></i> Forms
-                        </a>
-                    </li>
-                    <!-- Users page removed -->
-                </ul>
-                
-                <!-- Global Search -->
-                <div class="d-flex me-3">
-                    <div class="position-relative">
-                        <input type="text" class="form-control" id="globalSearch" placeholder="Search..." style="width: 250px;">
-                        <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted"></i>
-                        <div id="globalSearchResults" class="search-results"></div>
-                    </div>
-                </div>
-                
-                <!-- User menu removed - authentication no longer required -->
-            </div>
-        </div>
-    </nav>
+            <ul class="dhl-nav-links">
+                <li><a href="/" class="dhl-nav-link">Home</a></li>
+                <li><a href="/dashboard.html" class="dhl-nav-link active">Dashboard</a></li>
+                <li><a href="/forms-list.html" class="dhl-nav-link">Forms</a></li>
+                <li><a href="/apps.html" class="dhl-nav-link">Apps</a></li>
+            </ul>
+        </nav>
+    </header>
 
     <!-- Main Content -->
-    <div class="container-fluid py-4">
+    <div class="dhl-container py-4">
         <!-- Breadcrumbs -->
         <div id="breadcrumbs" class="mb-4"></div>
         
@@ -111,27 +72,24 @@
         <!-- Quick Actions -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card">
+                <div class="dhl-card">
                     <div class="card-body">
                         <h6 class="card-title mb-3">
                             <i class="fas fa-bolt"></i> Quick Actions
                         </h6>
                         <div class="row g-2">
                             <div class="col-md-3">
-                                <button class="btn btn-primary w-100" data-action="create-form">
+                                <button class="dhl-btn dhl-btn-primary w-100" data-action="create-form">
                                     <i class="fas fa-plus"></i> Create Form
                                 </button>
                             </div>
                             <div class="col-md-3">
-                                <!-- User management removed -->
-                            </div>
-                            <div class="col-md-3">
-                                <button class="btn btn-outline-primary w-100" data-action="create-app">
+                                <button class="dhl-btn dhl-btn-outline w-100" data-action="create-app">
                                     <i class="fas fa-th-large"></i> New Application
                                 </button>
                             </div>
                             <div class="col-md-3">
-                                <button class="btn btn-outline-secondary w-100" data-action="view-analytics">
+                                <button class="dhl-btn dhl-btn-outline w-100" data-action="view-analytics">
                                     <i class="fas fa-chart-line"></i> View Analytics
                                 </button>
                             </div>
@@ -142,67 +100,59 @@
         </div>
 
         <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Total Forms</h6>
-                                <h3 class="card-title mb-0" id="totalForms">-</h3>
-                                <small class="text-success" id="formsChange">-</small>
-                            </div>
-                            <div class="stats-icon bg-primary">
-                                <i class="fas fa-file-alt"></i>
-                            </div>
+        <div class="dhl-grid dhl-grid-4 mb-4">
+            <div class="dhl-card" style="border: 2px solid var(--primary-color); color: var(--text-primary);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Total Forms</h6>
+                            <h3 class="card-title mb-0" id="totalForms">-</h3>
+                            <small class="text-success" id="formsChange">-</small>
+                        </div>
+                        <div class="stats-icon bg-primary">
+                            <i class="fas fa-file-alt"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Total Responses</h6>
-                                <h3 class="card-title mb-0" id="totalResponses">-</h3>
-                                <small class="text-success" id="responsesChange">-</small>
-                            </div>
-                            <div class="stats-icon bg-success">
-                                <i class="fas fa-reply"></i>
-                            </div>
+            <div class="dhl-card" style="border: 2px solid var(--secondary-color); color: var(--text-primary);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Total Responses</h6>
+                            <h3 class="card-title mb-0" id="totalResponses">-</h3>
+                            <small class="text-success" id="responsesChange">-</small>
+                        </div>
+                        <div class="stats-icon bg-success">
+                            <i class="fas fa-reply"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Active Forms</h6>
-                                <h3 class="card-title mb-0" id="activeUsers">-</h3>
-                                <small class="text-success" id="usersChange">-</small>
-                            </div>
-                            <div class="stats-icon bg-info">
-                                <i class="fas fa-users"></i>
-                            </div>
+            <div class="dhl-card" style="border: 2px solid var(--accent-color); color: var(--text-primary);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Active Forms</h6>
+                            <h3 class="card-title mb-0" id="activeUsers">-</h3>
+                            <small class="text-success" id="usersChange">-</small>
+                        </div>
+                        <div class="stats-icon bg-info">
+                            <i class="fas fa-users"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Form Types</h6>
-                                <h3 class="card-title mb-0" id="totalApps">-</h3>
-                                <small class="text-success" id="appsChange">-</small>
-                            </div>
-                            <div class="stats-icon bg-warning">
-                                <i class="fas fa-th-large"></i>
-                            </div>
+            <div class="dhl-card" style="border: 2px solid var(--dark-color); color: var(--text-primary);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Form Types</h6>
+                            <h3 class="card-title mb-0" id="totalApps">-</h3>
+                            <small class="text-success" id="appsChange">-</small>
+                        </div>
+                        <div class="stats-icon bg-warning">
+                            <i class="fas fa-th-large"></i>
                         </div>
                     </div>
                 </div>
@@ -493,7 +443,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Date-fns -->
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <script type="module">
+    import * as datefns from 'https://cdn.jsdelivr.net/npm/date-fns@2.29.3/esm/index.js';
+    window.datefns = datefns;
+    </script>
     
     <!-- Custom JS -->
     <script src="/js/utils.js"></script>

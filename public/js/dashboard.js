@@ -80,7 +80,7 @@ class DashboardManager {
     document.addEventListener('click', (e) => {
       if (e.target.matches('[data-action="create-form"]')) {
         e.preventDefault();
-        this.showCreateFormModal();
+        window.location.href = '/forms-list.html';
       }
       
       if (e.target.matches('[data-action="create-user"]')) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey Builder - Create Beautiful Forms & Surveys</title>
+    <title>Survey Builder - Modern Forms, Simply Delivered</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     
     <!-- Bootstrap CSS -->
@@ -13,7 +13,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/dhl-theme.css" rel="stylesheet">
     <link href="/css/auth.css" rel="stylesheet">
     
     <style>
@@ -271,252 +271,123 @@
     </style>
 </head>
 <body>
-    <!-- Loading Spinner -->
-    <div id="loadingSpinner" class="loading-spinner">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+    <header class="dhl-header">
+        <nav class="dhl-nav">
+            <a href="/" class="dhl-logo">
+                <i class="fas fa-poll"></i>
+                Survey Builder
+            </a>
+            <ul class="dhl-nav-links">
+                <li><a href="/" class="dhl-nav-link active">Home</a></li>
+                <li><a href="/dashboard.html" class="dhl-nav-link">Dashboard</a></li>
+                <li><a href="/forms-list.html" class="dhl-nav-link">Forms</a></li>
+                <li><a href="/apps.html" class="dhl-nav-link">Apps</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="dhl-hero">
+        <div class="dhl-hero-content">
+            <h1 class="dhl-hero-title">Modern Forms, Simply Delivered</h1>
+            <p class="dhl-hero-subtitle">Build engaging surveys and forms with our intuitive platform. Collect and analyze data efficiently.</p>
+            <div class="dhl-hero-buttons">
+                <a href="/dashboard.html" class="dhl-btn dhl-btn-primary"><i class="fas fa-rocket"></i> Get Started</a>
+                <a href="#features" class="dhl-btn dhl-btn-secondary"><i class="fas fa-book-open"></i> Learn More</a>
+            </div>
         </div>
     </div>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <div class="hero-content">
-                        <h1 class="hero-title">Create Beautiful Forms & Surveys</h1>
-                        <p class="hero-subtitle">
-                            Build professional forms and surveys with our intuitive drag-and-drop builder. 
-                            Collect responses, analyze data, and make informed decisions.
-                        </p>
-                        <div class="hero-buttons">
-                            <a href="/form-builder.html" class="btn-hero btn-hero-primary">
-                                <i class="fas fa-plus"></i>
-                                Create Form
-                            </a>
-                            <a href="/forms-list.html" class="btn-hero btn-hero-secondary">
-                                <i class="fas fa-list"></i>
-                                View Forms
-                            </a>
-                            <a href="#features" class="btn-hero btn-hero-secondary">
-                                <i class="fas fa-info-circle"></i>
-                                Learn More
-                            </a>
-                        </div>
-                    </div>
+    
+    <section id="features" class="dhl-section dhl-section-alt">
+        <div class="dhl-container">
+            <div class="dhl-section-header">
+                <h2 class="dhl-section-title">Powerful Features</h2>
+                <p class="dhl-section-subtitle">Tools designed for efficient form building and data collection</p>
+            </div>
+            <div class="dhl-grid dhl-grid-3">
+                <div class="dhl-feature-card">
+                    <div class="dhl-feature-icon"><i class="fas fa-pencil-ruler"></i></div>
+                    <h3 class="dhl-feature-title">Intuitive Builder</h3>
+                    <p class="dhl-feature-description">Drag-and-drop interface for quick creation</p>
                 </div>
-                <div class="col-lg-6">
-                    <div class="hero-image text-center">
-                        <i class="fas fa-poll-h" style="font-size: 15rem; opacity: 0.3;"></i>
-                    </div>
+                <div class="dhl-feature-card">
+                    <div class="dhl-feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="dhl-feature-title">Advanced Analytics</h3>
+                    <p class="dhl-feature-description">Real-time insights and visualizations</p>
+                </div>
+                <div class="dhl-feature-card">
+                    <div class="dhl-feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3 class="dhl-feature-title">Responsive Design</h3>
+                    <p class="dhl-feature-description">Perfect on all devices</p>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Features Section -->
-    <section id="features" class="features-section">
-        <div class="container">
-            <div class="row text-center mb-5">
-                <div class="col-lg-8 mx-auto">
-                    <h2 class="display-5 fw-bold mb-3">Powerful Features</h2>
-                    <p class="lead text-muted">
-                        Everything you need to create, distribute, and analyze forms and surveys
-                    </p>
+    
+    <section class="dhl-stats">
+        <div class="dhl-container">
+            <div class="dhl-grid dhl-grid-4">
+                <div class="dhl-stat-item">
+                    <span class="dhl-stat-number">10K+</span>
+                    <span class="dhl-stat-label">Users</span>
                 </div>
-            </div>
-            
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-magic"></i>
-                        </div>
-                        <h3 class="feature-title">Drag & Drop Builder</h3>
-                        <p class="feature-description">
-                            Create forms effortlessly with our intuitive drag-and-drop interface. 
-                            No coding required.
-                        </p>
-                    </div>
+                <div class="dhl-stat-item">
+                    <span class="dhl-stat-number">50M+</span>
+                    <span class="dhl-stat-label">Responses</span>
                 </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3 class="feature-title">Mobile Responsive</h3>
-                        <p class="feature-description">
-                            Your forms look great on any device. Fully responsive design 
-                            ensures optimal user experience.
-                        </p>
-                    </div>
+                <div class="dhl-stat-item">
+                    <span class="dhl-stat-number">99.9%</span>
+                    <span class="dhl-stat-label">Uptime</span>
                 </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <h3 class="feature-title">Real-time Analytics</h3>
-                        <p class="feature-description">
-                            Track responses in real-time with detailed analytics and 
-                            beautiful visualizations.
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3 class="feature-title">Team Collaboration</h3>
-                        <p class="feature-description">
-                            Work together with your team. Share forms, manage permissions, 
-                            and collaborate seamlessly.
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h3 class="feature-title">Secure & Private</h3>
-                        <p class="feature-description">
-                            Your data is protected with enterprise-grade security. 
-                            GDPR compliant and privacy-focused.
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-puzzle-piece"></i>
-                        </div>
-                        <h3 class="feature-title">Integrations</h3>
-                        <p class="feature-description">
-                            Connect with your favorite tools. Export data, trigger webhooks, 
-                            and automate workflows.
-                        </p>
-                    </div>
+                <div class="dhl-stat-item">
+                    <span class="dhl-stat-number">24/7</span>
+                    <span class="dhl-stat-label">Support</span>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Stats Section -->
-    <section class="stats-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="stat-item">
-                        <span class="stat-number">10K+</span>
-                        <span class="stat-label">Forms Created</span>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="stat-item">
-                        <span class="stat-number">50K+</span>
-                        <span class="stat-label">Responses Collected</span>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="stat-item">
-                        <span class="stat-number">1K+</span>
-                        <span class="stat-label">Happy Users</span>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="stat-item">
-                        <span class="stat-number">99.9%</span>
-                        <span class="stat-label">Uptime</span>
-                    </div>
+    
+    <section class="dhl-section" style="background: var(--dark-color); color: var(--dhl-white);">
+        <div class="dhl-container text-center">
+            <h2 class="dhl-section-title">Ready to Start?</h2>
+            <p class="dhl-section-subtitle">Create your first form today</p>
+            <a href="/dashboard.html" class="dhl-btn dhl-btn-outline"><i class="fas fa-arrow-right"></i> Create Form</a>
+        </div>
+    </section>
+    
+    <footer class="dhl-footer">
+        <div class="dhl-container dhl-footer-content">
+            <div class="dhl-footer-section">
+                <h4>Survey Builder</h4>
+                <p>Empowering data collection</p>
+            </div>
+            <div class="dhl-footer-section">
+                <h4>Product</h4>
+                <ul class="list-unstyled">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Docs</a></li>
+                </ul>
+            </div>
+            <div class="dhl-footer-section">
+                <h4>Company</h4>
+                <ul class="list-unstyled">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="dhl-footer-section">
+                <h4>Connect</h4>
+                <div class="d-flex gap-3">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <h2 class="cta-title">Ready to Get Started?</h2>
-                    <p class="cta-subtitle">
-                        Join thousands of users who trust Survey Builder for their form and survey needs.
-                    </p>
-                    <a href="/setup.html" class="btn-hero btn-hero-primary" id="signUpBtn">
-                        <i class="fas fa-user-plus"></i>
-                        Sign Up Free
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <div class="footer-brand">
-                        <i class="fas fa-poll-h"></i>
-                        Survey Builder
-                    </div>
-                    <p class="footer-description">
-                        Create beautiful forms and surveys with ease. 
-                        Collect responses, analyze data, and make informed decisions.
-                    </p>
-                </div>
-                
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="mb-3">Product</h5>
-                    <ul class="footer-links">
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="/dashboard.html">Dashboard</a></li>
-                        <li><a href="/form-builder.html">Form Builder</a></li>
-                        <li><a href="#">Pricing</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="mb-3">Company</h5>
-                    <ul class="footer-links">
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="mb-3">Support</h5>
-                    <ul class="footer-links">
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">API</a></li>
-                        <li><a href="#">Status</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="mb-3">Legal</h5>
-                    <ul class="footer-links">
-                        <li><a href="#">Privacy</a></li>
-                        <li><a href="#">Terms</a></li>
-                        <li><a href="#">Security</a></li>
-                        <li><a href="#">GDPR</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 Survey Builder. All rights reserved.</p>
-            </div>
+        <div class="dhl-footer-bottom">
+            © 2024 Survey Builder. All rights reserved.
         </div>
     </footer>
 
@@ -531,7 +402,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Hide loading spinner
-            window.utils.hideLoading();
+            window.utils.loading.forceHide();
             
             // Check if user is already logged in
             const token = localStorage.getItem('token');

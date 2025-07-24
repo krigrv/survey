@@ -16,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     
     <!-- Custom CSS -->
-    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/dhl-theme.css" rel="stylesheet">
     <link href="/css/forms.css" rel="stylesheet">
     <link href="/css/shadcn-forms.css" rel="stylesheet">
     <link href="/css/form-builder.css" rel="stylesheet">
@@ -24,39 +24,31 @@
 <body>
 
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard.html">
-                <i class="fas fa-poll-h"></i> Survey Builder
+    <header class="dhl-header">
+        <nav class="dhl-nav">
+            <a href="/" class="dhl-logo">
+                <i class="fas fa-poll"></i>
+                Survey Builder
             </a>
-            
-            <div class="navbar-nav me-auto">
-                <span class="navbar-text">
-                    <i class="fas fa-edit"></i> Form Builder
-                </span>
-            </div>
-            
-            <!-- Form Actions -->
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-light" id="previewForm">
+            <div class="form-builder-actions">
+                <button class="dhl-btn dhl-btn-outline" id="previewBtn">
                     <i class="fas fa-eye"></i> Preview
                 </button>
-                <button class="btn btn-outline-light" id="saveForm">
+                <button class="dhl-btn dhl-btn-outline" id="saveBtn">
                     <i class="fas fa-save"></i> Save
                 </button>
-                <button class="btn btn-success" id="publishForm">
-                    <i class="fas fa-share"></i> Publish
+                <button class="dhl-btn dhl-btn-primary" id="publishBtn">
+                    <i class="fas fa-rocket"></i> Publish
                 </button>
-                <button class="btn btn-outline-light" id="formSettings">
+                <button class="dhl-btn dhl-btn-outline" id="settingsBtn">
                     <i class="fas fa-cog"></i> Settings
                 </button>
-                <a href="/forms.html" class="btn btn-outline-light">
+                <a href="/forms-list.html" class="dhl-btn dhl-btn-outline">
                     <i class="fas fa-times"></i> Close
                 </a>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
     <!-- Google Forms Style Container -->
     <div class="google-forms-container">

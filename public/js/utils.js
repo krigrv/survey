@@ -73,7 +73,8 @@ const toast = new ToastManager();
 // Loading spinner utilities
 class LoadingManager {
   constructor() {
-    this.spinner = document.getElementById('loading-spinner');
+    // Try both possible spinner IDs, but since we removed them, this will be null
+    this.spinner = document.getElementById('loadingSpinner') || document.getElementById('loading-spinner');
     this.loadingCount = 0;
   }
 
