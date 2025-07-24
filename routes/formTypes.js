@@ -32,13 +32,13 @@ function mapQuestionType(frontendType) {
 router.get('/', async (req, res) => {
   try {
     const formTypes = await FormType.find({ isActive: true })
-      .select('name description')
-      .sort({ name: 1 });
+      .select('name description type createdAt')
+      .sort({ createdAt: -1 });
     
     res.json(formTypes);
   } catch (error) {
     console.error('Get form types error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Failed to fetch form types' });
   }
 });
 
@@ -47,7 +47,7 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.post('/direct-save', async (req, res) => {
   try {
-    const { title, description, category } = req.body;
+    const { title, description, category, type } = req.body;
     
     if (!title) {
       return res.status(400).json({ message: 'Project title is required' });
@@ -60,6 +60,7 @@ router.post('/direct-save', async (req, res) => {
       name: title.trim(),
       description: description ? description.trim() : '',
       category: category || 'general',
+      type: type || 'form',
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date()

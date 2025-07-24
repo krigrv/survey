@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Builder - Modern Forms, Simply Delivered</title>
+    <title>Builder - Form Responses & Analytics</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     
     <!-- Bootstrap CSS -->
@@ -14,263 +14,97 @@
     
     <!-- Custom CSS -->
     <link href="/css/dhl-theme.css" rel="stylesheet">
-    <link href="/css/auth.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
     
     <style>
-        .dhl-hero {
-            background: 
-                linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)),
-                url('/images/dhl-delivery-hero.svg') !important;
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            height: 500px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            filter: brightness(0.8) grayscale(10%);
+        .main-content {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
         }
         
-        .dhl-hero-content {
-            position: relative;
-            z-index: 3;
-        }
-        
-        .dhl-hero-title {
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8) !important;
-            color: white !important;
-            font-weight: 700 !important;
-        }
-        
-        .dhl-hero-subtitle {
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7) !important;
-            color: white !important;
-            font-weight: 500 !important;
-        }
-        
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-        }
-        
-        .hero-subtitle {
-            font-size: 1.25rem;
+        .section-header {
             margin-bottom: 2rem;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .dhl-btn {
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
-            font-weight: 600 !important;
-            border-radius: 8px !important;
-            padding: 12px 24px !important;
-            transition: all 0.3s ease !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-        }
-        
-        .dhl-btn-primary {
-            background: #FFCC00 !important;
-            color: #2C2C2C !important;
-            border: 2px solid #FFCC00 !important;
-        }
-        
-        .dhl-btn-primary:hover {
-            background: #E6B800 !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3) !important;
-        }
-        
-        .dhl-btn-secondary {
-            background: transparent !important;
-            color: white !important;
-            border: 2px solid white !important;
-        }
-        
-        .dhl-btn-secondary:hover {
-            background: white !important;
-            color: #2C2C2C !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3) !important;
-        }
-        
-        .features-section {
-            padding: 5rem 0;
-            background: #f8f9fa;
-        }
-        
-        .feature-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            height: 100%;
         }
         
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 1.5rem;
-        }
-        
-        .feature-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
             color: #2d3748;
+            margin-bottom: 0.5rem;
         }
         
-        .feature-description {
+        .section-subtitle {
+            font-size: 1.1rem;
             color: #4a5568;
-            line-height: 1.6;
         }
         
-        .stats-section {
-            background: #667eea;
+        .section-divider {
+            margin: 4rem 0;
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+        }
+        
+        .stat-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 4rem 0;
-        }
-        
-        .stat-item {
-            text-align: center;
+            font-size: 1.5rem;
         }
         
         .stat-number {
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: 700;
-            display: block;
-            margin-bottom: 0.5rem;
+            color: #2d3748;
         }
         
         .stat-label {
-            font-size: 1.1rem;
-            opacity: 0.9;
+            color: #4a5568;
+            font-size: 0.9rem;
         }
         
-        .cta-section {
-            background: #2d3748;
-            color: white;
-            padding: 5rem 0;
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+        }
+        
+        .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 12px 12px 0 0 !important;
+        }
+        
+        .empty-state {
             text-align: center;
+            padding: 3rem 1rem;
         }
         
-        .cta-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #4a5568;
+            background: #f8f9fa;
         }
         
-        .cta-subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-        
-        .footer {
-            background: #1a202c;
-            color: white;
-            padding: 3rem 0 2rem 0;
-        }
-        
-        .footer-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .footer-description {
-            opacity: 0.8;
-            margin-bottom: 2rem;
-        }
-        
-        .footer-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-        
-        .footer-links a {
-            color: white;
-            text-decoration: none;
-            opacity: 0.8;
-            transition: opacity 0.2s ease;
-        }
-        
-        .footer-links a:hover {
-            opacity: 1;
-        }
-        
-        .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 2rem;
-            padding-top: 2rem;
-            text-align: center;
-            opacity: 0.6;
-        }
-        
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-            
-            .hero-subtitle {
-                font-size: 1.1rem;
-            }
-            
-            .hero-buttons {
-                justify-content: center;
-            }
-            
-            .btn-hero {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
-            }
-            
-            .features-section {
-                padding: 3rem 0;
-            }
-            
-            .stats-section {
-                padding: 3rem 0;
-            }
-            
-            .stat-number {
-                font-size: 2.5rem;
-            }
-            
-            .cta-section {
-                padding: 3rem 0;
-            }
-            
-            .cta-title {
-                font-size: 2rem;
-            }
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin: 0 0.125rem;
         }
     </style>
 </head>
@@ -278,8 +112,7 @@
     <header class="dhl-header">
         <nav class="dhl-nav">
             <a href="/" class="dhl-logo">
-                <img src="https://www.dhl.com/content/dam/dhl/global/core/images/logos/dhl-logo.svg" alt="DHL" style="height: 24px; margin-right: 6px;">
-                Builder
+                <img src="/images/dhl-logo.svg" alt="DHL Survey Builder" style="height: 32px; margin-right: 8px;">
             </a>
             <ul class="dhl-nav-links">
                 <li><a href="/" class="dhl-nav-link active">Home</a></li>
@@ -290,65 +123,220 @@
         </nav>
     </header>
     
-    <div class="dhl-hero">
-        <div class="dhl-hero-content">
-            <h1 class="dhl-hero-title">Modern Forms, Simply Delivered</h1>
-            <p class="dhl-hero-subtitle">Build engaging surveys and forms with our intuitive platform. Collect and analyze data efficiently.</p>
-            <div class="dhl-hero-buttons">
-                <a href="/dashboard.html" class="dhl-btn dhl-btn-primary"><i class="fas fa-rocket"></i> Get Started</a>
-            </div>
+    <main class="main-content">
+        <div class="container">
+            <!-- Form Responses Section -->
+            <section id="form-responses-section">
+                <div class="section-header">
+                    <h1 class="section-title">
+                        <i class="fas fa-chart-bar"></i> Form Responses
+                    </h1>
+                    <p class="section-subtitle">View and analyze form submissions</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-bar"></i> Form Responses
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="responses-container">
+                                    <div class="mb-3">
+                                        <label for="responseFormTypeSelect" class="form-label">Select Form Type to View:</label>
+                                        <select class="form-select" id="responseFormTypeSelect">
+                                            <option value="">Select a form type...</option>
+                                        </select>
+                                    </div>
+                                    <div id="responseFormsContainer">
+                                        <div class="empty-state">
+                                            <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                            <h5 class="text-muted">No forms found</h5>
+                                            <p class="text-muted">Select a form type above to view saved forms.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="section-divider">
+
+            <!-- Form Analytics Section -->
+            <section id="form-analytics-section">
+                <div class="section-header">
+                    <h1 class="section-title">
+                        <i class="fas fa-chart-line"></i> Form Analytics
+                    </h1>
+                    <p class="section-subtitle">Analyze form performance and insights</p>
+                </div>
+                
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon bg-primary">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="stat-number mb-0" id="totalFormsCount">0</h5>
+                                        <p class="stat-label mb-0">Total Forms</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon bg-success">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="stat-number mb-0" id="totalResponsesCount">0</h5>
+                                        <p class="stat-label mb-0">Total Responses</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon bg-warning">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="stat-number mb-0" id="totalViewsCount">0</h5>
+                                        <p class="stat-label mb-0">Total Views</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon bg-info">
+                                        <i class="fas fa-percentage"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="stat-number mb-0" id="conversionRate">0%</h5>
+                                        <p class="stat-label mb-0">Conversion Rate</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-line"></i> Forms & Responses Over Time
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="formsResponsesChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-pie"></i> Form Status Distribution
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="formStatusChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Created Forms -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-list"></i> All Created Forms
+                                </h5>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createFormModal">
+                                    <i class="fas fa-plus"></i> Create Form
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="allFormsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Form Name</th>
+                                                <th>Application</th>
+                                                <th>Status</th>
+                                                <th>Responses</th>
+                                                <th>Created</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Forms will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Top Performing Forms -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-clock"></i> Recent Activity
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="recentActivityList">
+                                    <!-- Recent activity items will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-trophy"></i> Top Performing Forms
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="topPerformingFormsList">
+                                    <!-- Top performing forms will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-    </div>
-    
-    <section id="features" class="dhl-section dhl-section-alt">
-        <div class="dhl-container">
-            <div class="dhl-section-header">
-                <h2 class="dhl-section-title">Powerful Features</h2>
-                <p class="dhl-section-subtitle">Tools designed for efficient form building and data collection</p>
-            </div>
-            <div class="dhl-grid dhl-grid-3">
-                <div class="dhl-feature-card">
-                    <div class="dhl-feature-icon"><i class="fas fa-pencil-ruler"></i></div>
-                    <h3 class="dhl-feature-title">Intuitive Builder</h3>
-                    <p class="dhl-feature-description">Drag-and-drop interface for quick creation</p>
-                </div>
-                <div class="dhl-feature-card">
-                    <div class="dhl-feature-icon"><i class="fas fa-chart-line"></i></div>
-                    <h3 class="dhl-feature-title">Advanced Analytics</h3>
-                    <p class="dhl-feature-description">Real-time insights and visualizations</p>
-                </div>
-                <div class="dhl-feature-card">
-                    <div class="dhl-feature-icon"><i class="fas fa-mobile-alt"></i></div>
-                    <h3 class="dhl-feature-title">Responsive Design</h3>
-                    <p class="dhl-feature-description">Perfect on all devices</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <section class="dhl-stats">
-        <div class="dhl-container">
-            <div class="dhl-grid dhl-grid-4">
-                <div class="dhl-stat-item">
-                    <span class="dhl-stat-number">10K+</span>
-                    <span class="dhl-stat-label">Users</span>
-                </div>
-                <div class="dhl-stat-item">
-                    <span class="dhl-stat-number">50M+</span>
-                    <span class="dhl-stat-label">Responses</span>
-                </div>
-                <div class="dhl-stat-item">
-                    <span class="dhl-stat-number">99.9%</span>
-                    <span class="dhl-stat-label">Uptime</span>
-                </div>
-                <div class="dhl-stat-item">
-                    <span class="dhl-stat-number">24/7</span>
-                    <span class="dhl-stat-label">Support</span>
-                </div>
-            </div>
-        </div>
-    </section>
-    
+    </main>
+
     <footer class="dhl-footer">
         <div class="dhl-container dhl-footer-content">
             <div class="dhl-footer-section">
@@ -376,7 +364,7 @@
                 <div class="d-flex gap-3">
                     <a href="#"><i class="fab fa-twitter"></i></a>
                     <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <li><a href="#"><i class="fab fa-linkedin"></i></a>
                     <a href="#"><i class="fab fa-github"></i></a>
                 </div>
             </div>
@@ -386,145 +374,102 @@
         </div>
     </footer>
 
+    <!-- Create Form Modal -->
+    <div class="modal fade" id="createFormModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus"></i> Create New Form
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createFormForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="formTitle" class="form-label">Form Title *</label>
+                            <input type="text" class="form-control" id="formTitle" name="title" required placeholder="Enter form title">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="formDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="formDescription" name="description" rows="3" placeholder="Brief description of the form"></textarea>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="formApplication" class="form-label">Application *</label>
+                            <select class="form-select" id="formApplication" name="applicationId" required>
+                                <option value="">Select Application</option>
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="formIsPublic" name="isPublic">
+                                <label class="form-check-label" for="formIsPublic">
+                                    Public Form (accessible without login)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create & Edit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Date-fns removed due to CDN issues -->
     
     <!-- Custom JS -->
     <script src="/js/utils.js"></script>
     <script src="/js/api.js"></script>
-    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Hide loading spinner
             window.utils.loading.forceHide();
             
-            // Check if user is already logged in
-            const token = localStorage.getItem('token');
-            if (token) {
-                // Update buttons for logged-in users
-                const getStartedBtn = document.getElementById('getStartedBtn');
-                const signUpBtn = document.getElementById('signUpBtn');
-                
-                if (getStartedBtn) {
-                    getStartedBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> Go to Dashboard';
-                    getStartedBtn.href = '/dashboard.html';
-                }
-                
-                if (signUpBtn) {
-                    signUpBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> Go to Dashboard';
-                    signUpBtn.href = '/dashboard.html';
-                }
-            } else {
-                // Update buttons for non-logged-in users
-                const getStartedBtn = document.getElementById('getStartedBtn');
-                const signUpBtn = document.getElementById('signUpBtn');
-                
-                if (getStartedBtn) {
-                    getStartedBtn.href = '/login.html';
-                }
-                
-                if (signUpBtn) {
-                    signUpBtn.href = '/setup.html';
-                }
+            // Initialize dashboard functionality for home page
+            const dashboard = new Dashboard();
+            
+            // Load form responses data and populate dropdown
+            dashboard.loadFormResponsesTab(); // This will populate the dropdown
+            
+            // Load analytics data
+            dashboard.loadFormAnalytics();
+            dashboard.loadAllCreatedForms();
+            dashboard.loadOverviewStats();
+            dashboard.loadCharts();
+            
+            // Initialize form creation modal
+            const createFormModal = document.getElementById('createFormModal');
+            if (createFormModal) {
+                createFormModal.addEventListener('show.bs.modal', function() {
+                    dashboard.loadApplicationsForFormCreation();
+                });
             }
             
-            // Smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
+            // Handle create form submission
+            const createFormForm = document.getElementById('createFormForm');
+            if (createFormForm) {
+                createFormForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
+                    dashboard.handleCreateForm(e);
                 });
-            });
-            
-            // Animate stats on scroll
-            const observerOptions = {
-                threshold: 0.5,
-                rootMargin: '0px 0px -100px 0px'
-            };
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const statNumbers = entry.target.querySelectorAll('.stat-number');
-                        statNumbers.forEach(stat => {
-                            const finalValue = stat.textContent;
-                            const numericValue = parseInt(finalValue.replace(/[^0-9]/g, ''));
-                            
-                            if (numericValue && !stat.classList.contains('animated')) {
-                                stat.classList.add('animated');
-                                animateNumber(stat, 0, numericValue, finalValue);
-                            }
-                        });
-                    }
-                });
-            }, observerOptions);
-            
-            const statsSection = document.querySelector('.stats-section');
-            if (statsSection) {
-                observer.observe(statsSection);
             }
-            
-            function animateNumber(element, start, end, finalText) {
-                const duration = 2000;
-                const startTime = performance.now();
-                
-                function update(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    
-                    const current = Math.floor(start + (end - start) * easeOutQuart(progress));
-                    
-                    if (finalText.includes('K')) {
-                        element.textContent = (current / 1000).toFixed(current >= 1000 ? 0 : 1) + 'K+';
-                    } else if (finalText.includes('%')) {
-                        element.textContent = (current / 10).toFixed(1) + '%';
-                    } else {
-                        element.textContent = current.toLocaleString();
-                    }
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(update);
-                    } else {
-                        element.textContent = finalText;
-                    }
-                }
-                
-                requestAnimationFrame(update);
-            }
-            
-            function easeOutQuart(t) {
-                return 1 - Math.pow(1 - t, 4);
-            }
-            
-            // Add scroll effect to feature cards
-            const featureCards = document.querySelectorAll('.feature-card');
-            const cardObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry, index) => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
-                        }, index * 100);
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            });
-            
-            featureCards.forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                cardObserver.observe(card);
-            });
         });
     </script>
 </body>

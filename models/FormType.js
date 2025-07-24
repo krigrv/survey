@@ -15,6 +15,10 @@ const formTypeSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  type: {
+    type: String,
+    default: 'form'
+  },
   // createdBy removed - user references eliminated
   createdAt: {
     type: Date,

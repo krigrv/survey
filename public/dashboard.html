@@ -12,16 +12,21 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
+    <!-- Sortable.js for form builder -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
     <!-- Custom CSS -->
     <link href="/css/dhl-theme.css" rel="stylesheet">
     <link href="/css/forms.css" rel="stylesheet">
+    <link href="/css/shadcn-forms.css" rel="stylesheet">
+    <link href="/css/form-builder.css" rel="stylesheet">
+    <link href="/css/steps.css" rel="stylesheet">
     <!-- Authentication CSS removed -->
 </head>
 <body>    <header class="dhl-header">
         <nav class="dhl-nav">
             <a href="/" class="dhl-logo">
-                <i class="fas fa-poll"></i>
-                Survey Builder
+                <img src="/images/dhl-logo.svg" alt="DHL Survey Builder" style="height: 32px; margin-right: 8px;">
             </a>
             <ul class="dhl-nav-links">
                 <li><a href="/" class="dhl-nav-link">Home</a></li>
@@ -34,6 +39,8 @@
 
     <!-- Main Content -->
     <div class="dhl-container py-4">
+        <!-- Alert Container -->
+        <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>
         <!-- Breadcrumbs -->
         <div id="breadcrumbs" class="mb-4"></div>
         
@@ -45,163 +52,293 @@
                         <i class="fas fa-tachometer-alt"></i>
                         Dashboard
                     </h1>
-                    <p class="page-description text-muted">Welcome back! Here's what's happening with your forms.</p>
-                </div>
-                <div class="col-auto">
-                    <div class="btn-group">
-                        <select class="form-select" id="periodFilter">
-                            <option value="7">Last 7 days</option>
-                            <option value="30" selected>Last 30 days</option>
-                            <option value="90">Last 90 days</option>
-                            <option value="365">Last year</option>
-                        </select>
-                    </div>
-                    <div class="btn-group ms-2">
-                        <select class="form-select" id="appFilter">
-                            <option value="all">All Applications</option>
-                            <!-- Options will be loaded dynamically -->
-                        </select>
-                    </div>
-                    <button class="btn btn-outline-secondary ms-2" id="refreshDashboard">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+                    <p class="page-description text-muted">Welcome back! Manage your tenants, forms, and analytics.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="dhl-card">
-                    <div class="card-body">
-                        <h6 class="card-title mb-3">
-                            <i class="fas fa-bolt"></i> Quick Actions
-                        </h6>
-                        <div class="row g-2">
-                            <div class="col-md-3">
-                                <button class="dhl-btn dhl-btn-primary w-100" data-action="create-form">
-                                    <i class="fas fa-plus"></i> Create Form
-                                </button>
-                            </div>
-                            <div class="col-md-3">
-                                <button class="dhl-btn dhl-btn-outline w-100" data-action="create-app">
-                                    <i class="fas fa-th-large"></i> New Application
-                                </button>
-                            </div>
-                            <div class="col-md-3">
-                                <button class="dhl-btn dhl-btn-outline w-100" data-action="view-analytics">
-                                    <i class="fas fa-chart-line"></i> View Analytics
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Statistics Cards -->
-        <div class="dhl-grid dhl-grid-4 mb-4">
-            <div class="dhl-card" style="border: 2px solid var(--primary-color); color: var(--text-primary);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-2 text-muted">Total Forms</h6>
-                            <h3 class="card-title mb-0" id="totalForms">-</h3>
-                            <small class="text-success" id="formsChange">-</small>
-                        </div>
-                        <div class="stats-icon bg-primary">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="dhl-card" style="border: 2px solid var(--secondary-color); color: var(--text-primary);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-2 text-muted">Total Responses</h6>
-                            <h3 class="card-title mb-0" id="totalResponses">-</h3>
-                            <small class="text-success" id="responsesChange">-</small>
-                        </div>
-                        <div class="stats-icon bg-success">
-                            <i class="fas fa-reply"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="dhl-card" style="border: 2px solid var(--accent-color); color: var(--text-primary);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-2 text-muted">Active Forms</h6>
-                            <h3 class="card-title mb-0" id="activeUsers">-</h3>
-                            <small class="text-success" id="usersChange">-</small>
-                        </div>
-                        <div class="stats-icon bg-info">
-                            <i class="fas fa-users"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="dhl-card" style="border: 2px solid var(--dark-color); color: var(--text-primary);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-2 text-muted">Form Types</h6>
-                            <h3 class="card-title mb-0" id="totalApps">-</h3>
-                            <small class="text-success" id="appsChange">-</small>
-                        </div>
-                        <div class="stats-icon bg-warning">
-                            <i class="fas fa-th-large"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title mb-0">
-                            <i class="fas fa-chart-line"></i> Forms & Responses Over Time
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="formsResponsesChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title mb-0">
-                            <i class="fas fa-chart-pie"></i> Form Status Distribution
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="formStatusChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Content Row -->
+        <!-- Step-by-Step Progress Layout -->
         <div class="row">
-            <!-- Recent Activity -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title mb-0">
-                            <i class="fas fa-clock"></i> Recent Activity
-                        </h6>
+            <!-- Left Sidebar - Steps Navigation -->
+            <div class="col-md-3">
+                <div class="steps-sidebar">
+                    <div class="steps-container">
+                        <div class="step-item active" data-step="1" data-target="#tenant-onboarding">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-title">Tenant Onboarding</div>
+                                <div class="step-description">Setup your organization</div>
+                            </div>
+                            <div class="step-connector"></div>
+                        </div>
+                        
+                        <div class="step-item" data-step="2" data-target="#form-creation">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-title">Form Creation</div>
+                                <div class="step-description">Build survey forms</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div id="recentActivity">
-                            <div class="text-center py-3">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            
+            <!-- Right Content Area -->
+            <div class="col-md-9">
+                <!-- Step Content -->
+                <div class="step-content-area">
+                    <!-- Step 1: Tenant Onboarding -->
+                    <div class="step-pane active" id="tenant-onboarding">
+                        <div class="step-header mb-4">
+                            <h3 class="step-main-title">
+                                <span class="step-badge">Step 1</span>
+                                <i class="fas fa-building"></i> Tenant Onboarding
+                            </h3>
+                            <p class="step-subtitle text-muted">Setup your organization and create your first tenant</p>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Create Tenant Form -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-plus-circle"></i> Create New Tenant
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="tenantForm">
+                                            <div class="mb-3">
+                                                <label for="teamName" class="form-label">Team Name *</label>
+                                                <input type="text" class="form-control" id="teamName" name="teamName" required 
+                                                       placeholder="Enter your team name">
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="teamDescription" class="form-label">Team Description</label>
+                                                <textarea class="form-control" id="teamDescription" name="teamDescription" rows="3" 
+                                                          placeholder="Describe your team's purpose"></textarea>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="domain" class="form-label">Domain *</label>
+                                                <select class="form-select" id="domain" name="domain" required>
+                                                    <option value="">Select domain</option>
+                                                    <option value="logistics">Logistics</option>
+                                                    <option value="shipping">Shipping</option>
+                                                    <option value="warehouse">Warehouse</option>
+                                                    <option value="delivery">Delivery</option>
+                                                    <option value="customs">Customs</option>
+                                                    <option value="finance">Finance</option>
+                                                    <option value="hr">Human Resources</option>
+                                                    <option value="it">IT Support</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="adminAccess" class="form-label">Admin Email *</label>
+                                                <input type="email" class="form-control" id="adminAccess" name="adminAccess" required 
+                                                       placeholder="admin@domain.com">
+                                            </div>
+                                            
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save"></i> Create Tenant
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Existing Tenants List -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-list"></i> Existing Form Types
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="tenantsList">
+                                            <div class="text-center py-3">
+                                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Form Creation -->
+                    <div class="step-pane" id="form-creation">
+                        <div class="step-header mb-4">
+                            <h3 class="step-main-title">
+                                <span class="step-badge">Step 2</span>
+                                <i class="fas fa-plus-circle"></i> Form Creation
+                            </h3>
+                            <p class="step-subtitle text-muted">Create and design your survey forms</p>
+                        </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-plus-circle"></i> Create Survey Form
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="surveyFormCreation">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="tenantSelect" class="form-label">Select Tenant *</label>
+                                                <select class="form-select" id="formType" name="formType" required>
+                                                    <option value="">Choose a tenant</option>
+                                                    <!-- Options will be loaded dynamically -->
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="surveyFormName" class="form-label">Survey Form Name *</label>
+                                                <input type="text" class="form-control" id="surveyFormName" name="surveyFormName" required placeholder="Enter survey form name">
+                                                <small class="form-text text-muted">Enter a descriptive name for your survey</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button type="submit" class="dhl-btn dhl-btn-primary">
+                                            <i class="fas fa-arrow-right"></i> Proceed to Form Builder
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <!-- Form Builder Container (will be shown when proceeding) -->
+                                <div id="formBuilderContainer" style="display: none;">
+                                    <!-- Breadcrumb for form builder -->
+                                    <nav aria-label="breadcrumb" class="mb-3">
+                                        <ol class="breadcrumb">
+                                            <li class="breadcrumb-item"><a href="#" id="backToFormCreation">Create Survey Form</a></li>
+                                            <li class="breadcrumb-item active" aria-current="page">Form Builder</li>
+                                        </ol>
+                                    </nav>
+                                    
+                                    <!-- Form Builder Actions -->
+                                    <div class="form-builder-actions mb-3 d-flex gap-2">
+                                        <button class="dhl-btn dhl-btn-outline" id="previewForm">
+                                            <i class="fas fa-eye"></i> Preview
+                                        </button>
+                                        <button class="dhl-btn dhl-btn-outline" id="saveForm">
+                                            <i class="fas fa-save"></i> Save
+                                        </button>
+                                        <button class="dhl-btn dhl-btn-primary" id="publishForm">
+                                            <i class="fas fa-rocket"></i> Publish
+                                        </button>
+                                        <button class="dhl-btn dhl-btn-outline" id="formSettings">
+                                            <i class="fas fa-cog"></i> Settings
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Integrated Form Builder Content -->
+                                    <div class="google-forms-container dhl-card" style="border: 2px solid var(--primary-color); padding: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                                        <!-- Top Tabs -->
+                                        <div class="form-tabs">
+                                            <div class="tab-container">
+                                                <button class="tab-button active" data-tab="questions">
+                                                    <i class="fas fa-question-circle"></i> Questions
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Main Form Area -->
+                                        <div class="form-main-area">
+                                            <!-- Questions Tab Content -->
+                                            <div class="tab-content" id="questionsTab">
+                                                <!-- Form Header Card -->
+                                                <div class="form-header-card dhl-card" style="border: 1px solid var(--dhl-gray-light); margin-bottom: var(--spacing-md);">
+                                                    <div class="form-header-content" style="padding: var(--spacing-md);">
+                                                        <input type="text" class="form-title-input" placeholder="Untitled form" id="builderFormTitle" value="Untitled form" style="border: 1px solid var(--dhl-gray-light); border-radius: var(--border-radius-sm); padding: var(--spacing-sm);">
+                                                        <div class="form-type-selector" style="margin: 10px 0;">
+                                                            <label for="builderFormType" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--text-primary);">Form Type *</label>
+                                                            <select class="form-type-dropdown" id="builderFormType" style="width: 100%; max-width: 300px; border: 1px solid var(--dhl-gray-light); border-radius: var(--border-radius-sm); padding: var(--spacing-sm);">
+                                                                <option value="">Select form type...</option>
+                                                            </select>
+                                                        </div>
+                                                        <textarea class="form-description-input" placeholder="Form description" id="builderFormDescription" style="border: 1px solid var(--dhl-gray-light); border-radius: var(--border-radius-sm); padding: var(--spacing-sm);"></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Form Questions Container -->
+                                                <div class="form-questions-container" id="formQuestions">
+                                                    <!-- Sample Question -->
+                                                    <div class="question-card dhl-card" data-question-id="1" style="border: 1px solid var(--dhl-gray-light); margin-bottom: var(--spacing-md);">
+                                                        <div class="question-content" style="padding: var(--spacing-md);">
+                                                            <div class="question-header">
+                                                                <input type="text" class="question-title" placeholder="Untitled Question" value="Untitled Question" style="border: 1px solid var(--dhl-gray-light); border-radius: var(--border-radius-sm); padding: var(--spacing-sm); margin-bottom: var(--spacing-sm);">
+                                                                <div class="question-type-selector">
+                                                                    <select class="question-type-dropdown" style="border: 1px solid var(--dhl-gray-light); border-radius: var(--border-radius-sm); padding: var(--spacing-sm);">
+                                                                        <option value="multiple-choice" selected>Multiple choice</option>
+                                                                        <option value="short-answer">Short answer</option>
+                                                                        <option value="paragraph">Paragraph</option>
+                                                                        <option value="checkboxes">Checkboxes</option>
+                                                                        <option value="dropdown">Dropdown</option>
+                                                                        <option value="linear-scale">Linear scale</option>
+                                                                        <option value="date">Date</option>
+                                                                        <option value="time">Time</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="question-options">
+                                                                <div class="option-item">
+                                                                    <div class="option-radio">
+                                                                        <input type="radio" disabled>
+                                                                    </div>
+                                                                    <input type="text" class="option-input" placeholder="Option 1" value="Option 1">
+                                                                    <button class="option-delete" title="Delete option">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="option-item add-option">
+                                                                    <div class="option-radio">
+                                                                        <input type="radio" disabled>
+                                                                    </div>
+                                                                    <span class="add-option-text">Add option or <span class="add-other-link">add "Other"</span></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="question-footer">
+                                                            <div class="question-actions">
+                                                                <button class="action-btn" title="Duplicate">
+                                                                    <i class="fas fa-copy"></i>
+                                                                </button>
+                                                                <button class="action-btn" title="Delete">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                                <div class="required-toggle">
+                                                                    <label class="toggle-label">
+                                                                        Required
+                                                                        <input type="checkbox" class="required-checkbox">
+                                                                        <span class="toggle-slider"></span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Add Question Button -->
+                                                <div class="add-question-container">
+                                                    <button class="add-question-btn dhl-btn dhl-btn-primary" id="addQuestionBtn" style="border: 1px solid var(--primary-color);">
+                                                        <i class="fas fa-plus"></i> Add Question
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -209,54 +346,10 @@
                 </div>
             </div>
 
-            <!-- Top Forms -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title mb-0">
-                            <i class="fas fa-star"></i> Top Performing Forms
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div id="topForms">
-                            <div class="text-center py-3">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- My Forms Section (for non-admin users) -->
-        <div class="row mt-4" id="myFormsSection" style="display: none;">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="card-title mb-0">
-                                <i class="fas fa-file-alt"></i> My Forms
-                            </h6>
-                            <a href="/forms.html" class="btn btn-sm btn-outline-primary">
-                                View All <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="myForms">
-                            <div class="text-center py-3">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Create Form Modal -->
     <div class="modal fade" id="createFormModal" tabindex="-1">
@@ -453,6 +546,7 @@
     <script src="/js/api.js"></script>
     <!-- Authentication script removed -->
     <script src="/js/dashboard.js"></script>
+    <script src="/js/form-builder.js"></script>
     <script src="/js/main.js"></script>
 </body>
 </html>
